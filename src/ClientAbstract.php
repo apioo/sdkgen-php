@@ -20,6 +20,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use PSX\Schema\SchemaManager;
 use PSX\Uri\Url;
+use Sdkgen\Client\Credentials\HttpBasic;
+use Sdkgen\Client\Credentials\HttpBearer;
 use Sdkgen\Client\Exception\FoundNoAccessTokenException;
 use Sdkgen\Client\Exception\InvalidAccessTokenException;
 use Sdkgen\Client\Exception\InvalidCredentialsException;
@@ -36,19 +38,19 @@ abstract class ClientAbstract
 {
     private const USER_AGENT = 'SDKgen Client v0.1';
     private const JWT_ALG = 'HS256';
+    private const EXPIRE_THRESHOLD = 60 * 10;
+
+    protected ?CredentialsInterface $credentials = null;
 
     private string $baseUri;
     private TokenStoreInterface $tokenStore;
     private SchemaManager $schemaManager;
-    private ?CredentialsInterface $credentials = null;
-    private array $config;
 
     public function __construct(string $baseUri, ?TokenStoreInterface $tokenStore = null)
     {
         $this->baseUri = $baseUri;
         $this->tokenStore = $tokenStore ?? new MemoryTokenStore();
         $this->schemaManager = new SchemaManager();
-        $this->config = $this->configure();
     }
 
     /**
@@ -63,8 +65,8 @@ abstract class ClientAbstract
      */
     public function buildRedirectUrl(?string $redirectUrl = null, ?array $scopes = []): string
     {
-        if (!$this->credentials instanceof Credentials\OAuth2) {
-            throw new InvalidCredentialsException('Provided no OAuth2 credentials, please set the credentials before calling this method');
+        if (!$this->credentials instanceof Credentials\AuthorizationCode) {
+            throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 authorization code flow');
         }
 
         $state = JWT::encode(['iat' => time(), 'exp' => time() + (60 * 5)], $this->credentials->getClientSecret(), self::JWT_ALG);
@@ -83,18 +85,11 @@ abstract class ClientAbstract
             $parameters['scope'] = implode(',', $scopes);
         }
 
-        $url = new Url($this->config['security']['flows']['authorizationCode']['authorizationUrl']);
+        $url = new Url($this->credentials->getAuthorizationUrl());
         $url = $url->withParameters(array_merge($url->getParameters(), $parameters));
 
         return $url->toString();
     }
-
-    /**
-     * Returns the configuration for this client
-     *
-     * @return array
-     */
-    abstract protected function configure(): array;
 
     /**
      * @param string $code
@@ -108,8 +103,8 @@ abstract class ClientAbstract
      */
     protected function fetchAccessTokenByCode(string $code, string $state)
     {
-        if (!$this->credentials instanceof Credentials\OAuth2) {
-            throw new InvalidCredentialsException('Provided no OAuth2 credentials, please set the credentials before calling this method');
+        if (!$this->credentials instanceof Credentials\AuthorizationCode) {
+            throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 authorization code flow');
         }
 
         try {
@@ -118,16 +113,16 @@ abstract class ClientAbstract
             throw new InvalidStateException('Provided state is invalid', 0, $e);
         }
 
-        $response = $this->newHttpClient(null)->post($this->config['security']['flows']['authorizationCode']['tokenUrl'], [
+        $credentials = new HttpBasic($this->credentials->getClientId(), $this->credentials->getClientSecret());
+
+        $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
             'headers' => [
                 'User-Agent' => self::USER_AGENT,
-                'Authorization' => 'Basic ' . base64_encode($this->credentials->getClientId() . ':' . $this->credentials->getClientSecret()),
                 'Accept' => 'application/json',
             ],
             'form_params' => [
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-                'redirect_uri' => 'https://apigen.app/callback',
             ]
         ]);
 
@@ -143,14 +138,15 @@ abstract class ClientAbstract
      */
     protected function fetchAccessTokenByClientCredentials(): AccessToken
     {
-        if (!$this->credentials instanceof Credentials\OAuth2) {
-            throw new InvalidCredentialsException('Provided no OAuth2 credentials, please set the credentials before calling this method');
+        if (!$this->credentials instanceof Credentials\ClientCredentials) {
+            throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 client credentials flow');
         }
 
-        $response = $this->newHttpClient(null)->post($this->config['security']['flows']['clientCredentials']['tokenUrl'], [
+        $credentials = new HttpBasic($this->credentials->getClientId(), $this->credentials->getClientSecret());
+
+        $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
             'headers' => [
                 'User-Agent' => self::USER_AGENT,
-                'Authorization' => 'Basic ' . base64_encode($this->credentials->getClientId() . ':' . $this->credentials->getClientSecret()),
                 'Accept' => 'application/json',
             ],
             'form_params' => [
@@ -171,14 +167,15 @@ abstract class ClientAbstract
      */
     protected function fetchAccessTokenByRefresh(string $refreshToken): AccessToken
     {
-        if (!$this->credentials instanceof Credentials\OAuth2) {
-            throw new InvalidCredentialsException('Provided no OAuth2 credentials, please set the credentials before calling this method');
+        if (!$this->credentials instanceof Credentials\OAuth2Abstract) {
+            throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 flow');
         }
 
-        $response = $this->newHttpClient(null)->post($this->config['security']['flows']['authorizationCode']['refreshUrl'], [
+        $credentials = new HttpBearer($this->getAccessToken(false, 0));
+
+        $response = $this->newHttpClient($credentials)->post($this->credentials->getRefreshUrl(), [
             'headers' => [
                 'User-Agent' => self::USER_AGENT,
-                'Authorization' => 'Basic ' . base64_encode($this->credentials->getClientId() . ':' . $this->credentials->getClientSecret()),
                 'Accept' => 'application/json',
             ],
             'form_params' => [
@@ -191,44 +188,52 @@ abstract class ClientAbstract
     }
 
     /**
-     * @param CredentialsInterface|null $credentials
-     * @return Client
+     * @param bool $automaticRefresh
+     * @param int $expireThreshold
+     * @return string
      * @throws FoundNoAccessTokenException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    protected function getAccessToken(bool $automaticRefresh = true, int $expireThreshold = self::EXPIRE_THRESHOLD): string
+    {
+        $accessToken = $this->tokenStore->get();
+        if ($accessToken instanceof AccessToken && $accessToken->getExpiresIn() > (time() + $expireThreshold)) {
+            return $accessToken->getAccessToken();
+        }
+
+        if ($automaticRefresh && $accessToken->getRefreshToken()) {
+            return $this->fetchAccessTokenByRefresh($accessToken->getRefreshToken())->getAccessToken();
+        } else {
+            throw new InvalidCredentialsException('Could not refresh token since the used token is either not available or expired, please obtain a new access token');
+        }
+    }
+
+    /**
+     * @param CredentialsInterface|null $credentials
+     * @return Client
      */
     private function newHttpClient(?CredentialsInterface $credentials): Client
     {
         $stack = new HandlerStack();
         $stack->setHandler(new CurlHandler());
 
-        if ($this->config['security']['type'] === 'http' && $this->config['security']['scheme'] === 'basic' && $credentials instanceof Credentials\Basic) {
+        if ($credentials instanceof Credentials\HttpBasic) {
             $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($credentials) {
                 return $request->withHeader('Authorization', 'Basic ' . base64_encode($credentials->getUserName() . ':' . $credentials->getPassword()));
             }));
-        } elseif ($this->config['security']['type'] === 'http' && $this->config['security']['scheme'] === 'bearer' && $credentials instanceof Credentials\Token) {
+        } elseif ($credentials instanceof Credentials\HttpBearer) {
             $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($credentials) {
                 return $request->withHeader('Authorization', 'Bearer ' . $credentials->getToken());
             }));
-        } elseif ($this->config['security']['type'] === 'apiKey' && $this->config['security']['in'] == 'header' && $credentials instanceof Credentials\Token) {
-            $name = $this->config['security']['name'];
-            $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($credentials, $name) {
-                return $request->withHeader($name, $credentials->getToken());
+        } elseif ($credentials instanceof Credentials\ApiKey) {
+            $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($credentials) {
+                return $request->withHeader($credentials->getName(), $credentials->getToken());
             }));
-        } elseif ($this->config['security']['type'] === 'oauth2' && $credentials instanceof Credentials\OAuth2) {
-            $accessToken = $this->tokenStore->get();
-            if (!$accessToken instanceof AccessToken) {
-                throw new FoundNoAccessTokenException('No access token was obtained, please obtain an access token before making an request');
-            }
-
-            // in case the token is expired try to obtain a new token in case a refresh token is available
-            if ($accessToken->getExpiresIn() < time() && $accessToken->getRefreshToken()) {
-                $accessToken = $this->fetchAccessTokenByRefresh($accessToken->getRefreshToken());
-            }
-
-            $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($accessToken) {
-                return $request->withHeader('Authorization', 'Bearer ' . $accessToken->getAccessToken());
+        } elseif ($credentials instanceof Credentials\OAuth2Abstract) {
+            $stack->push(Middleware::mapRequest(function (RequestInterface $request) {
+                return $request->withHeader('Authorization', 'Bearer ' . $this->getAccessToken());
             }));
         }
 

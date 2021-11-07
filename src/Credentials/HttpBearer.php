@@ -14,29 +14,22 @@ namespace Sdkgen\Client\Credentials;
 use Sdkgen\Client\CredentialsInterface;
 
 /**
- * OAuth2
+ * HttpBearer
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class OAuth2 implements CredentialsInterface
+class HttpBearer implements CredentialsInterface
 {
-    private string $clientId;
-    private string $clientSecret;
+    private string $token;
 
-    public function __construct(string $clientId, string $clientSecret)
+    public function __construct(string $token)
     {
-        $this->clientId = $clientId;
-        $this->clientSecret = $clientSecret;
+        $this->token = $token;
     }
 
-    public function getClientId(): string
+    public function getToken(): string
     {
-        return $this->clientId;
-    }
-
-    public function getClientSecret(): string
-    {
-        return $this->clientSecret;
+        return $this->token;
     }
 }

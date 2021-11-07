@@ -26,14 +26,12 @@ use PSX\Schema\Visitor\TypeVisitor;
 abstract class ResourceAbstract
 {
     protected string $baseUrl;
-    protected string $token;
     protected Client $httpClient;
     protected SchemaManager $schemaManager;
 
-    public function __construct(string $baseUrl, string $token, ?Client $httpClient = null, ?SchemaManager $schemaManager = null)
+    public function __construct(string $baseUrl, ?Client $httpClient = null, ?SchemaManager $schemaManager = null)
     {
         $this->baseUrl = $baseUrl;
-        $this->token = $token;
         $this->httpClient = $httpClient ?? new Client();
         $this->schemaManager = $schemaManager ?? new SchemaManager();
     }

@@ -11,25 +11,12 @@
 
 namespace Sdkgen\Client\Credentials;
 
-use Sdkgen\Client\CredentialsInterface;
-
 /**
- * Token
+ * AuthorizationCode
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class Token implements CredentialsInterface
+class AuthorizationCode extends OAuth2Abstract
 {
-    private string $token;
-
-    public function __construct(string $token)
-    {
-        $this->token = $token;
-    }
-
-    public function getToken(): string
-    {
-        return $this->token;
-    }
 }

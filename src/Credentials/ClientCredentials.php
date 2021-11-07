@@ -11,32 +11,12 @@
 
 namespace Sdkgen\Client\Credentials;
 
-use Sdkgen\Client\CredentialsInterface;
-
 /**
- * Basic
+ * ClientCredentials
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class Basic implements CredentialsInterface
+class ClientCredentials extends OAuth2Abstract
 {
-    private string $userName;
-    private string $password;
-
-    public function __construct(string $userName, string $password)
-    {
-        $this->userName = $userName;
-        $this->password = $password;
-    }
-
-    public function getUserName(): string
-    {
-        return $this->userName;
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
 }
