@@ -42,13 +42,13 @@ abstract class ClientAbstract
     private const EXPIRE_THRESHOLD = 60 * 10;
 
     protected ?CredentialsInterface $credentials = null;
-    protected string $baseUri;
+    protected string $baseUrl;
     protected TokenStoreInterface $tokenStore;
     protected SchemaManager $schemaManager;
 
-    public function __construct(string $baseUri, ?TokenStoreInterface $tokenStore = null)
+    public function __construct(string $baseUrl, ?TokenStoreInterface $tokenStore = null)
     {
-        $this->baseUri = $baseUri;
+        $this->baseUrl = $baseUrl;
         $this->tokenStore = $tokenStore ?? new MemoryTokenStore();
         $this->schemaManager = new SchemaManager();
     }
