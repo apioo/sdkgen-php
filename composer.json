@@ -1,9 +1,9 @@
 {
   "name": "sdkgen/client",
   "description": "SDKgen client",
-  "keywords": ["sdk", "generator", "client"],
+  "keywords": ["sdkgen", "sdk", "generator", "client"],
   "homepage": "https://sdkgen.app",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "authors": [
     {
       "name": "Christoph Kappestein",

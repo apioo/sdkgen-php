@@ -12,6 +12,7 @@
 namespace Sdkgen\Client;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
@@ -108,7 +109,7 @@ abstract class ClientAbstract
         }
 
         try {
-            JWT::decode($state, $this->credentials->getClientSecret(), [self::JWT_ALG]);
+            JWT::decode($state, new Key($this->credentials->getClientSecret(), self::JWT_ALG));
         } catch (\Exception $e) {
             throw new InvalidStateException('Provided state is invalid', 0, $e);
         }
