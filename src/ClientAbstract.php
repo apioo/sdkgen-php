@@ -214,7 +214,7 @@ abstract class ClientAbstract
      * @param CredentialsInterface|null $credentials
      * @return Client
      */
-    private function newHttpClient(?CredentialsInterface $credentials): Client
+    protected function newHttpClient(?CredentialsInterface $credentials): Client
     {
         $stack = new HandlerStack();
         $stack->setHandler(new CurlHandler());
