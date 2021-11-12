@@ -11,8 +11,6 @@
 
 namespace Sdkgen\Client;
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
@@ -26,7 +24,6 @@ use Sdkgen\Client\Credentials\HttpBearer;
 use Sdkgen\Client\Exception\FoundNoAccessTokenException;
 use Sdkgen\Client\Exception\InvalidAccessTokenException;
 use Sdkgen\Client\Exception\InvalidCredentialsException;
-use Sdkgen\Client\Exception\InvalidStateException;
 use Sdkgen\Client\TokenStore\MemoryTokenStore;
 
 /**
@@ -38,7 +35,6 @@ use Sdkgen\Client\TokenStore\MemoryTokenStore;
 abstract class ClientAbstract
 {
     private const USER_AGENT = 'SDKgen Client v0.1';
-    private const JWT_ALG = 'HS256';
     private const EXPIRE_THRESHOLD = 60 * 10;
 
     protected ?CredentialsInterface $credentials = null;
@@ -63,18 +59,15 @@ abstract class ClientAbstract
      *
      * @throws InvalidCredentialsException
      */
-    public function buildRedirectUrl(?string $redirectUrl = null, ?array $scopes = []): string
+    public function buildRedirectUrl(?string $redirectUrl = null, ?array $scopes = [], ?string $state = null): string
     {
         if (!$this->credentials instanceof Credentials\AuthorizationCode) {
             throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 authorization code flow');
         }
 
-        $state = JWT::encode(['iat' => time(), 'exp' => time() + (60 * 5)], $this->credentials->getClientSecret(), self::JWT_ALG);
-
         $parameters = [
             'response_type' => 'code',
             'client_id' => $this->credentials->getClientId(),
-            'state' => $state,
         ];
 
         if (!empty($redirectUrl)) {
@@ -85,6 +78,10 @@ abstract class ClientAbstract
             $parameters['scope'] = implode(',', $scopes);
         }
 
+        if (!empty($state)) {
+            $parameters['state'] = $state;
+        }
+
         $url = new Url($this->credentials->getAuthorizationUrl());
         $url = $url->withParameters(array_merge($url->getParameters(), $parameters));
 
@@ -93,24 +90,16 @@ abstract class ClientAbstract
 
     /**
      * @param string $code
-     * @param string $state
      * @return AccessToken
      * @throws FoundNoAccessTokenException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
-     * @throws InvalidStateException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function fetchAccessTokenByCode(string $code, string $state)
+    protected function fetchAccessTokenByCode(string $code)
     {
         if (!$this->credentials instanceof Credentials\AuthorizationCode) {
             throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 authorization code flow');
-        }
-
-        try {
-            JWT::decode($state, new Key($this->credentials->getClientSecret(), self::JWT_ALG));
-        } catch (\Exception $e) {
-            throw new InvalidStateException('Provided state is invalid', 0, $e);
         }
 
         $credentials = new HttpBasic($this->credentials->getClientId(), $this->credentials->getClientSecret());
