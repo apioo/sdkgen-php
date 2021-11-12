@@ -91,7 +91,6 @@ abstract class ClientAbstract
     /**
      * @param string $code
      * @return AccessToken
-     * @throws FoundNoAccessTokenException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -188,14 +187,18 @@ abstract class ClientAbstract
     protected function getAccessToken(bool $automaticRefresh = true, int $expireThreshold = self::EXPIRE_THRESHOLD): string
     {
         $accessToken = $this->tokenStore->get();
-        if ($accessToken instanceof AccessToken && $accessToken->getExpiresIn() > (time() + $expireThreshold)) {
+        if (!$accessToken instanceof AccessToken) {
+            throw new FoundNoAccessTokenException('Found no access token, please obtain an access token before making an request');
+        }
+
+        if ($accessToken->getExpiresIn() > (time() + $expireThreshold)) {
             return $accessToken->getAccessToken();
         }
 
         if ($automaticRefresh && $accessToken->getRefreshToken()) {
             return $this->fetchAccessTokenByRefresh($accessToken->getRefreshToken())->getAccessToken();
         } else {
-            throw new InvalidCredentialsException('Could not refresh token since the used token is either not available or expired, please obtain a new access token');
+            return $accessToken->getAccessToken();
         }
     }
 
