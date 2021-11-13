@@ -37,14 +37,15 @@ abstract class ClientAbstract
     private const USER_AGENT = 'SDKgen Client v0.1';
     private const EXPIRE_THRESHOLD = 60 * 10;
 
-    protected ?CredentialsInterface $credentials = null;
     protected string $baseUrl;
+    protected ?CredentialsInterface $credentials;
     protected TokenStoreInterface $tokenStore;
     protected SchemaManager $schemaManager;
 
-    public function __construct(string $baseUrl, ?TokenStoreInterface $tokenStore = null)
+    public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null, ?TokenStoreInterface $tokenStore = null)
     {
         $this->baseUrl = $baseUrl;
+        $this->credentials = $credentials;
         $this->tokenStore = $tokenStore ?? new MemoryTokenStore();
         $this->schemaManager = new SchemaManager();
     }
@@ -186,6 +187,10 @@ abstract class ClientAbstract
      */
     protected function getAccessToken(bool $automaticRefresh = true, int $expireThreshold = self::EXPIRE_THRESHOLD): string
     {
+        if (!$this->tokenStore instanceof TokenStoreInterface) {
+            throw new FoundNoAccessTokenException('No token store was configured');
+        }
+
         $accessToken = $this->tokenStore->get();
         if (!$accessToken instanceof AccessToken) {
             throw new FoundNoAccessTokenException('Found no access token, please obtain an access token before making an request');
