@@ -96,7 +96,7 @@ abstract class ClientAbstract
      * @throws InvalidCredentialsException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function fetchAccessTokenByCode(string $code)
+    protected function fetchAccessTokenByCode(string $code): AccessToken
     {
         if (!$this->credentials instanceof Credentials\AuthorizationCode) {
             throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 authorization code flow');
@@ -115,7 +115,7 @@ abstract class ClientAbstract
             ]
         ]);
 
-        return $this->parseResponse($response);
+        return $this->parseTokenResponse($response);
     }
 
     /**
@@ -143,7 +143,7 @@ abstract class ClientAbstract
             ]
         ]);
 
-        return $this->parseResponse($response);
+        return $this->parseTokenResponse($response);
     }
 
     /**
@@ -173,7 +173,7 @@ abstract class ClientAbstract
             ]
         ]);
 
-        return $this->parseResponse($response);
+        return $this->parseTokenResponse($response);
     }
 
     /**
@@ -207,12 +207,12 @@ abstract class ClientAbstract
         }
     }
 
-    /**
-     * @param CredentialsInterface|null $credentials
-     * @return Client
-     */
-    protected function newHttpClient(?CredentialsInterface $credentials): Client
+    protected function newHttpClient(?CredentialsInterface $credentials = null): Client
     {
+        if ($credentials === null) {
+            $credentials = $this->credentials;
+        }
+
         $stack = new HandlerStack();
         $stack->setHandler(new CurlHandler());
 
@@ -228,7 +228,7 @@ abstract class ClientAbstract
             $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($credentials) {
                 return $request->withHeader($credentials->getName(), $credentials->getToken());
             }));
-        } elseif ($credentials instanceof Credentials\OAuth2Abstract) {
+        } elseif ($this->credentials instanceof Credentials\OAuth2Abstract) {
             $stack->push(Middleware::mapRequest(function (RequestInterface $request) {
                 return $request->withHeader('Authorization', 'Bearer ' . $this->getAccessToken());
             }));
@@ -242,7 +242,7 @@ abstract class ClientAbstract
      * @return AccessToken
      * @throws InvalidAccessTokenException
      */
-    private function parseResponse(ResponseInterface $response)
+    private function parseTokenResponse(ResponseInterface $response): AccessToken
     {
         if ($response->getStatusCode() !== 200) {
             throw new InvalidAccessTokenException('Could not obtain access token');
@@ -255,9 +255,7 @@ abstract class ClientAbstract
 
         $token = AccessToken::fromArray($data);
 
-        if ($this->tokenStore instanceof TokenStoreInterface) {
-            $this->tokenStore->persist($token);
-        }
+        $this->tokenStore->persist($token);
 
         return $token;
     }
