@@ -34,7 +34,7 @@ use Sdkgen\Client\TokenStore\MemoryTokenStore;
  */
 abstract class ClientAbstract
 {
-    private const USER_AGENT = 'SDKgen Client v0.1';
+    private const USER_AGENT = 'SDKgen Client v0.2';
     private const EXPIRE_THRESHOLD = 60 * 10;
 
     protected string $baseUrl;
