@@ -40,13 +40,15 @@ abstract class ClientAbstract
     protected string $baseUrl;
     protected ?CredentialsInterface $credentials;
     protected TokenStoreInterface $tokenStore;
+    protected ?array $scopes;
     protected SchemaManager $schemaManager;
 
-    public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null, ?TokenStoreInterface $tokenStore = null)
+    public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null, ?TokenStoreInterface $tokenStore = null, ?array $scopes = null)
     {
         $this->baseUrl = $baseUrl;
         $this->credentials = $credentials;
         $this->tokenStore = $tokenStore ?? new MemoryTokenStore();
+        $this->scopes = $scopes;
         $this->schemaManager = new SchemaManager();
     }
 
@@ -77,6 +79,8 @@ abstract class ClientAbstract
 
         if (!empty($scopes)) {
             $parameters['scope'] = implode(',', $scopes);
+        } elseif (!empty($this->scopes)) {
+            $parameters['scope'] = implode(',', $this->scopes);
         }
 
         if (!empty($state)) {
@@ -120,7 +124,6 @@ abstract class ClientAbstract
 
     /**
      * @return AccessToken
-     * @throws FoundNoAccessTokenException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -133,14 +136,20 @@ abstract class ClientAbstract
 
         $credentials = new HttpBasic($this->credentials->getClientId(), $this->credentials->getClientSecret());
 
+        $parameters = [
+            'grant_type' => 'client_credentials',
+        ];
+
+        if (!empty($this->scopes)) {
+            $parameters['scope'] = implode(',', $this->scopes);
+        }
+
         $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
             'headers' => [
                 'User-Agent' => self::USER_AGENT,
                 'Accept' => 'application/json',
             ],
-            'form_params' => [
-                'grant_type' => 'client_credentials',
-            ]
+            'form_params' => $parameters
         ]);
 
         return $this->parseTokenResponse($response);
