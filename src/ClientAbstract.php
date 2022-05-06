@@ -19,6 +19,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use PSX\Schema\SchemaManager;
 use PSX\Uri\Url;
+use Sdkgen\Client\Credentials\ClientCredentials;
 use Sdkgen\Client\Credentials\HttpBasic;
 use Sdkgen\Client\Credentials\HttpBearer;
 use Sdkgen\Client\Exception\FoundNoAccessTokenException;
@@ -196,13 +197,14 @@ abstract class ClientAbstract
      */
     protected function getAccessToken(bool $automaticRefresh = true, int $expireThreshold = self::EXPIRE_THRESHOLD): string
     {
-        if (!$this->tokenStore instanceof TokenStoreInterface) {
-            throw new FoundNoAccessTokenException('No token store was configured');
-        }
-
         $accessToken = $this->tokenStore->get();
         if (!$accessToken instanceof AccessToken) {
-            throw new FoundNoAccessTokenException('Found no access token, please obtain an access token before making an request');
+            if ($this->credentials instanceof ClientCredentials) {
+                // in case we have no token we can obtain automatically an access token for client credentials
+                $accessToken = $this->fetchAccessTokenByClientCredentials();
+            } else {
+                throw new FoundNoAccessTokenException('Found no access token, please obtain an access token before making an request');
+            }
         }
 
         if ($accessToken->getExpiresIn() > (time() + $expireThreshold)) {
@@ -254,10 +256,10 @@ abstract class ClientAbstract
     private function parseTokenResponse(ResponseInterface $response): AccessToken
     {
         if ($response->getStatusCode() !== 200) {
-            throw new InvalidAccessTokenException('Could not obtain access token');
+            throw new InvalidAccessTokenException('Could not obtain access token, received a non successful status code: ' . $response->getStatusCode());
         }
 
-        $data = \json_decode((string) $response->getBody());
+        $data = \json_decode((string) $response->getBody(), true);
         if (!is_array($data)) {
             throw new InvalidAccessTokenException('Could not obtain access token');
         }
