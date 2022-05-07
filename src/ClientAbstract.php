@@ -198,8 +198,8 @@ abstract class ClientAbstract
     protected function getAccessToken(bool $automaticRefresh = true, int $expireThreshold = self::EXPIRE_THRESHOLD): string
     {
         $accessToken = $this->tokenStore->get();
-        if (!$accessToken instanceof AccessToken && $this->credentials instanceof ClientCredentials) {
-            // in case we have no token we can obtain automatically an access token for client credentials
+        if ((!$accessToken instanceof AccessToken || $accessToken->getExpiresIn() < time()) && $this->credentials instanceof ClientCredentials) {
+            // in case we have no token or the token is expired we can obtain automatically an access token for client credentials
             $accessToken = $this->fetchAccessTokenByClientCredentials();
         }
 
