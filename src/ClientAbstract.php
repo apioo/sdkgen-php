@@ -198,13 +198,13 @@ abstract class ClientAbstract
     protected function getAccessToken(bool $automaticRefresh = true, int $expireThreshold = self::EXPIRE_THRESHOLD): string
     {
         $accessToken = $this->tokenStore->get();
+        if (!$accessToken instanceof AccessToken && $this->credentials instanceof ClientCredentials) {
+            // in case we have no token we can obtain automatically an access token for client credentials
+            $accessToken = $this->fetchAccessTokenByClientCredentials();
+        }
+
         if (!$accessToken instanceof AccessToken) {
-            if ($this->credentials instanceof ClientCredentials) {
-                // in case we have no token we can obtain automatically an access token for client credentials
-                $accessToken = $this->fetchAccessTokenByClientCredentials();
-            } else {
-                throw new FoundNoAccessTokenException('Found no access token, please obtain an access token before making an request');
-            }
+            throw new FoundNoAccessTokenException('Found no access token, please obtain an access token before making an request');
         }
 
         if ($accessToken->getExpiresIn() > (time() + $expireThreshold)) {
@@ -212,10 +212,10 @@ abstract class ClientAbstract
         }
 
         if ($automaticRefresh && $accessToken->getRefreshToken()) {
-            return $this->fetchAccessTokenByRefresh($accessToken->getRefreshToken())->getAccessToken();
-        } else {
-            return $accessToken->getAccessToken();
+            $accessToken = $this->fetchAccessTokenByRefresh($accessToken->getRefreshToken());
         }
+
+        return $accessToken->getAccessToken();
     }
 
     protected function newHttpClient(?CredentialsInterface $credentials = null): Client
