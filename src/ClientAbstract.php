@@ -224,8 +224,7 @@ abstract class ClientAbstract
             $credentials = $this->credentials;
         }
 
-        $stack = new HandlerStack();
-        $stack->setHandler(new CurlHandler());
+        $stack = HandlerStack::create();
 
         if ($credentials instanceof Credentials\HttpBasic) {
             $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($credentials) {
