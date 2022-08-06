@@ -41,4 +41,9 @@ class CacheTokenStore implements TokenStoreInterface
     {
         $this->cache->set($this->cacheKey, $token);
     }
+
+    public function remove(): void
+    {
+        $this->cache->delete($this->cacheKey);
+    }
 }

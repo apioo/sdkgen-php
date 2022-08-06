@@ -19,13 +19,9 @@ namespace Sdkgen\Client;
  */
 interface TokenStoreInterface
 {
-    /**
-     * @return AccessToken|null
-     */
     public function get(): ?AccessToken;
 
-    /**
-     * @param AccessToken $token
-     */
     public function persist(AccessToken $token): void;
+
+    public function remove(): void;
 }

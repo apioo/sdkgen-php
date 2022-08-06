@@ -33,4 +33,9 @@ class MemoryTokenStore implements TokenStoreInterface
     {
         $this->token = $token;
     }
+
+    public function remove(): void
+    {
+        $this->token = null;
+    }
 }

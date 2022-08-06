@@ -34,17 +34,33 @@ class FileTokenStore implements TokenStoreInterface
     public function get(): ?AccessToken
     {
         $file = $this->getFileName();
-        if (is_file($file)) {
-            return AccessToken::fromArray(json_decode(file_get_contents($file), true));
-        } else {
+        if (!is_file($file)) {
             return null;
         }
+
+        $raw = file_get_contents($file);
+        if (empty($raw)) {
+            return null;
+        }
+
+        $data = json_decode($raw, true);
+        if (!is_array($data)) {
+            return null;
+        }
+
+        return AccessToken::fromArray($data);
     }
 
     public function persist(AccessToken $token): void
     {
         $file = $this->getFileName();
         file_put_contents($file, json_encode($token->toArray()));
+    }
+
+    public function remove(): void
+    {
+        $file = $this->getFileName();
+        file_put_contents($file, '');
     }
 
     private function getFileName(): string

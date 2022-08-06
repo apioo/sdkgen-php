@@ -38,4 +38,11 @@ class SessionTokenStore implements TokenStoreInterface
     {
         $_SESSION[$this->sessionKey] = $token;
     }
+
+    public function remove(): void
+    {
+        if (isset($_SESSION[$this->sessionKey])) {
+            unset($_SESSION[$this->sessionKey]);
+        }
+    }
 }
