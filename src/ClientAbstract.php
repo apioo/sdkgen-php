@@ -172,7 +172,7 @@ abstract class ClientAbstract
 
         $credentials = new HttpBearer($this->getAccessToken(false, 0));
 
-        $response = $this->newHttpClient($credentials)->post($this->credentials->getRefreshUrl(), [
+        $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
             'headers' => [
                 'User-Agent' => self::USER_AGENT,
                 'Accept' => 'application/json',

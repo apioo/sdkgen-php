@@ -25,15 +25,13 @@ abstract class OAuth2Abstract implements CredentialsInterface
     private string $clientSecret;
     private string $tokenUrl;
     private string $authorizationUrl;
-    private string $refreshUrl;
 
-    public function __construct(string $clientId, string $clientSecret, string $tokenUrl, string $authorizationUrl, string $refreshUrl)
+    public function __construct(string $clientId, string $clientSecret, string $tokenUrl, string $authorizationUrl)
     {
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
         $this->tokenUrl = $tokenUrl;
         $this->authorizationUrl = $authorizationUrl;
-        $this->refreshUrl = $refreshUrl;
     }
 
     public function getClientId(): string
@@ -54,10 +52,5 @@ abstract class OAuth2Abstract implements CredentialsInterface
     public function getAuthorizationUrl(): string
     {
         return $this->authorizationUrl;
-    }
-
-    public function getRefreshUrl(): string
-    {
-        return $this->refreshUrl;
     }
 }
