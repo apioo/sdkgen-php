@@ -12,7 +12,6 @@
 namespace Sdkgen\Client;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
@@ -35,14 +34,15 @@ use Sdkgen\Client\TokenStore\MemoryTokenStore;
  */
 abstract class ClientAbstract
 {
-    private const USER_AGENT = 'SDKgen Client v0.2';
+    private const USER_AGENT = 'SDKgen Client v1.0';
     private const EXPIRE_THRESHOLD = 60 * 10;
 
     protected string $baseUrl;
     protected ?CredentialsInterface $credentials;
     protected TokenStoreInterface $tokenStore;
     protected ?array $scopes;
-    protected SchemaManager $schemaManager;
+    protected Client $httpClient;
+    protected Parser $parser;
 
     public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null, ?TokenStoreInterface $tokenStore = null, ?array $scopes = null)
     {
@@ -50,7 +50,8 @@ abstract class ClientAbstract
         $this->credentials = $credentials;
         $this->tokenStore = $tokenStore ?? new MemoryTokenStore();
         $this->scopes = $scopes;
-        $this->schemaManager = new SchemaManager();
+        $this->httpClient = $this->newHttpClient();
+        $this->parser = new Parser($baseUrl, new SchemaManager());
     }
 
     /**
