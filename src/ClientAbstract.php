@@ -24,6 +24,7 @@ abstract class ClientAbstract
 {
     public const USER_AGENT = 'SDKgen Client v1.0';
 
+    protected AuthenticatorInterface $authenticator;
     protected Client $httpClient;
     protected Parser $parser;
 
@@ -32,7 +33,13 @@ abstract class ClientAbstract
      */
     public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null)
     {
-        $this->httpClient = (new HttpClientFactory(AuthenticatorFactory::factory($credentials ?? new Credentials\Anonymous())))->factory();
+        $this->authenticator = AuthenticatorFactory::factory($credentials ?? new Credentials\Anonymous());
+        $this->httpClient = (new HttpClientFactory($this->authenticator))->factory();
         $this->parser = new Parser($baseUrl);
+    }
+
+    public function getAuthenticator(): AuthenticatorInterface
+    {
+        return $this->authenticator;
     }
 }
