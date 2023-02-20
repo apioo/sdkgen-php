@@ -12,7 +12,6 @@
 namespace Sdkgen\Client;
 
 use GuzzleHttp\Client;
-use PSX\Json\Parser;
 
 /**
  * TagAbstract
