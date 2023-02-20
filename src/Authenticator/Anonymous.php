@@ -9,14 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace Sdkgen\Client\Exception;
+namespace Sdkgen\Client\Authenticator;
+
+use Psr\Http\Message\RequestInterface;
+use Sdkgen\Client\AuthenticatorInterface;
+use Sdkgen\Client\Credentials;
 
 /**
- * On client generation every known error response exception extends from this exception
+ * Anonymous
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class KnownErrorException extends ErrorException
+class Anonymous implements AuthenticatorInterface
 {
+    public function __construct(Credentials\Anonymous $credentials)
+    {
+    }
+
+    public function __invoke(RequestInterface $request): RequestInterface
+    {
+        return $request;
+    }
 }

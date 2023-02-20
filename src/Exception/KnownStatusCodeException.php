@@ -12,11 +12,11 @@
 namespace Sdkgen\Client\Exception;
 
 /**
- * Base error exception class
+ * On client generation every known error response exception extends from this exception
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class ErrorException extends \Exception
+class KnownStatusCodeException extends ClientException
 {
 }

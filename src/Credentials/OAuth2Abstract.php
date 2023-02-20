@@ -12,6 +12,7 @@
 namespace Sdkgen\Client\Credentials;
 
 use Sdkgen\Client\CredentialsInterface;
+use Sdkgen\Client\TokenStoreInterface;
 
 /**
  * OAuth2
@@ -25,13 +26,17 @@ abstract class OAuth2Abstract implements CredentialsInterface
     private string $clientSecret;
     private string $tokenUrl;
     private string $authorizationUrl;
+    private ?TokenStoreInterface $tokenStore;
+    private ?array $scopes;
 
-    public function __construct(string $clientId, string $clientSecret, string $tokenUrl, string $authorizationUrl)
+    public function __construct(string $clientId, string $clientSecret, string $tokenUrl, string $authorizationUrl, ?TokenStoreInterface $tokenStore = null, ?array $scopes = null)
     {
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
         $this->tokenUrl = $tokenUrl;
         $this->authorizationUrl = $authorizationUrl;
+        $this->tokenStore = $tokenStore;
+        $this->scopes = $scopes;
     }
 
     public function getClientId(): string
@@ -52,5 +57,15 @@ abstract class OAuth2Abstract implements CredentialsInterface
     public function getAuthorizationUrl(): string
     {
         return $this->authorizationUrl;
+    }
+
+    public function getTokenStore(): ?TokenStoreInterface
+    {
+        return $this->tokenStore;
+    }
+
+    public function getScopes(): ?array
+    {
+        return $this->scopes;
     }
 }

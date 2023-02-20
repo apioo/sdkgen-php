@@ -11,14 +11,12 @@
 
 namespace Sdkgen\Client;
 
-use GuzzleHttp\Exception\BadResponseException;
 use PSX\Json\Parser as JsonParser;
 use PSX\Schema\Exception\InvalidSchemaException;
 use PSX\Schema\Exception\ValidationException;
 use PSX\Schema\SchemaManager;
 use PSX\Schema\SchemaTraverser;
 use PSX\Schema\Visitor\TypeVisitor;
-use Sdkgen\Client\Exception\ErrorException;
 use Sdkgen\Client\Exception\ParseException;
 
 /**
@@ -77,25 +75,6 @@ class Parser
         }
 
         return $result;
-    }
-
-    public function newException(BadResponseException $e, array $mapping): ErrorException
-    {
-        $statusCode = $e->getResponse()->getStatusCode();
-        if (isset($mapping[$statusCode])) {
-            $class = $mapping[$statusCode];
-            $exceptionClass = $class . 'Exception';
-
-            $data = (string) $e->getResponse()->getBody();
-            $model = $this->parse($data, $class);
-
-            $exception = new $exceptionClass($model);
-            if ($exception instanceof ErrorException) {
-                return $exception;
-            }
-        }
-
-        return new ErrorException('The server returned an unknown status code');
     }
 
     private function substituteParameters(string $url, array $parameters): string

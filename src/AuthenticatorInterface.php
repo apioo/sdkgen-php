@@ -9,14 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Sdkgen\Client\Exception;
+namespace Sdkgen\Client;
+
+use Psr\Http\Message\RequestInterface;
 
 /**
- * FoundNoAccessTokenException
+ * AuthenticatorInterface
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class FoundNoAccessTokenException extends ClientException
+interface AuthenticatorInterface
 {
+    public function __invoke(RequestInterface $request): RequestInterface;
 }

@@ -18,6 +18,6 @@ namespace Sdkgen\Client\Exception;
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class UnknownErrorException extends ErrorException
+class UnknownStatusCodeException extends ClientException
 {
 }

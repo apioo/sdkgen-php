@@ -17,6 +17,6 @@ namespace Sdkgen\Client\Exception;
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class InvalidCredentialsException extends \Exception
+class InvalidCredentialsException extends ClientException
 {
 }

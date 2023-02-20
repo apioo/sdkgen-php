@@ -12,11 +12,11 @@
 namespace Sdkgen\Client\Exception;
 
 /**
- * FoundNoAccessTokenException
+ * Base exception class
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class FoundNoAccessTokenException extends ClientException
+class ClientException extends \Exception
 {
 }
