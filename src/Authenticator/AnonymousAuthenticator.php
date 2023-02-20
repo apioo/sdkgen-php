@@ -16,12 +16,12 @@ use Sdkgen\Client\AuthenticatorInterface;
 use Sdkgen\Client\Credentials;
 
 /**
- * Anonymous
+ * AnonymousAuthenticator
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class Anonymous implements AuthenticatorInterface
+class AnonymousAuthenticator implements AuthenticatorInterface
 {
     public function __construct(Credentials\Anonymous $credentials)
     {

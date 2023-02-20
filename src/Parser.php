@@ -30,10 +30,10 @@ class Parser
     private string $baseUrl;
     private SchemaManager $schemaManager;
 
-    public function __construct(string $baseUrl, SchemaManager $schemaManager)
+    public function __construct(string $baseUrl)
     {
         $this->baseUrl = $baseUrl;
-        $this->schemaManager = $schemaManager;
+        $this->schemaManager = new SchemaManager();
     }
 
     public function url(string $path, array $parameters): string

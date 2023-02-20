@@ -39,7 +39,7 @@ abstract class ClientAbstract
         $this->baseUrl = $baseUrl;
         $this->authenticator = AuthenticatorFactory::factory($credentials ?? new Credentials\Anonymous());
         $this->httpClient = (new HttpClientFactory($this->authenticator))->factory();
-        $this->parser = new Parser($baseUrl, new SchemaManager());
+        $this->parser = new Parser($baseUrl);
     }
 
     /**

@@ -36,7 +36,8 @@ class HttpClientFactory
         $stack = HandlerStack::create();
         $stack->push(Middleware::mapRequest($this->authenticator));
         $stack->push(Middleware::mapRequest(function(RequestInterface $request) {
-            return $request->withHeader('User-Agent', ClientAbstract::USER_AGENT);
+            $request = $request->withHeader('User-Agent', ClientAbstract::USER_AGENT);
+            return $request->withHeader('Accept', 'application/json');
         }));
 
         return new Client(['handler' => $stack]);

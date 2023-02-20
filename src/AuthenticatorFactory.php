@@ -27,15 +27,15 @@ class AuthenticatorFactory
     public static function factory(CredentialsInterface $credentials): AuthenticatorInterface
     {
         if ($credentials instanceof Credentials\HttpBasic) {
-            return new Authenticator\HttpBasic($credentials);
+            return new Authenticator\HttpBasicAuthenticator($credentials);
         } elseif ($credentials instanceof Credentials\HttpBearer) {
-            return new Authenticator\HttpBearer($credentials);
+            return new Authenticator\HttpBearerAuthenticator($credentials);
         } elseif ($credentials instanceof Credentials\ApiKey) {
-            return new Authenticator\ApiKey($credentials);
+            return new Authenticator\ApiKeyAuthenticator($credentials);
         } elseif ($credentials instanceof Credentials\OAuth2Abstract) {
-            return new Authenticator\OAuth2($credentials);
+            return new Authenticator\OAuth2Authenticator($credentials);
         } elseif ($credentials instanceof Credentials\Anonymous) {
-            return new Authenticator\Anonymous($credentials);
+            return new Authenticator\AnonymousAuthenticator($credentials);
         } else {
             throw new InvalidCredentialsException('Could not find authenticator for credentials: ' . get_class($credentials));
         }

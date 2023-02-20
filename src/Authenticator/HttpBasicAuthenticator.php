@@ -16,12 +16,12 @@ use Sdkgen\Client\AuthenticatorInterface;
 use Sdkgen\Client\Credentials;
 
 /**
- * HttpBasic
+ * HttpBasicAuthenticator
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class HttpBasic implements AuthenticatorInterface
+class HttpBasicAuthenticator implements AuthenticatorInterface
 {
     private Credentials\HttpBasic $credentials;
 

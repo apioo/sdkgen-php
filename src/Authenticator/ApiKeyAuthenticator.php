@@ -16,22 +16,22 @@ use Sdkgen\Client\AuthenticatorInterface;
 use Sdkgen\Client\Credentials;
 
 /**
- * HttpBearer
+ * ApiKeyAuthenticator
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class HttpBearer implements AuthenticatorInterface
+class ApiKeyAuthenticator implements AuthenticatorInterface
 {
-    private Credentials\HttpBearer $credentials;
+    private Credentials\ApiKey $credentials;
 
-    public function __construct(Credentials\HttpBearer $credentials)
+    public function __construct(Credentials\ApiKey $credentials)
     {
         $this->credentials = $credentials;
     }
 
     public function __invoke(RequestInterface $request): RequestInterface
     {
-        return $request->withHeader('Authorization', 'Bearer ' . $this->credentials->getToken());
+        return $request->withHeader($this->credentials->getName(), $this->credentials->getToken());
     }
 }

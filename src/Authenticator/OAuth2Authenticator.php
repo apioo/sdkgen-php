@@ -19,7 +19,6 @@ use PSX\Uri\Url;
 use Sdkgen\Client\AccessToken;
 use Sdkgen\Client\AuthenticatorFactory;
 use Sdkgen\Client\AuthenticatorInterface;
-use Sdkgen\Client\ClientAbstract;
 use Sdkgen\Client\Credentials;
 use Sdkgen\Client\CredentialsInterface;
 use Sdkgen\Client\Exception\Authenticator\AccessTokenRequestException;
@@ -31,12 +30,12 @@ use Sdkgen\Client\TokenStore\MemoryTokenStore;
 use Sdkgen\Client\TokenStoreInterface;
 
 /**
- * OAuth2
+ * OAuth2Authenticator
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class OAuth2 implements AuthenticatorInterface
+class OAuth2Authenticator implements AuthenticatorInterface
 {
     private const EXPIRE_THRESHOLD = 60 * 10;
 
@@ -119,7 +118,6 @@ class OAuth2 implements AuthenticatorInterface
         try {
             $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
                 'headers' => [
-                    'User-Agent' => ClientAbstract::USER_AGENT,
                     'Accept' => 'application/json',
                 ],
                 'form_params' => [
@@ -154,7 +152,6 @@ class OAuth2 implements AuthenticatorInterface
         try {
             $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
                 'headers' => [
-                    'User-Agent' => ClientAbstract::USER_AGENT,
                     'Accept' => 'application/json',
                 ],
                 'form_params' => $parameters
@@ -179,7 +176,6 @@ class OAuth2 implements AuthenticatorInterface
         try {
             $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
                 'headers' => [
-                    'User-Agent' => ClientAbstract::USER_AGENT,
                     'Accept' => 'application/json',
                 ],
                 'form_params' => [
