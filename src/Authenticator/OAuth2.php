@@ -22,9 +22,10 @@ use Sdkgen\Client\AuthenticatorInterface;
 use Sdkgen\Client\ClientAbstract;
 use Sdkgen\Client\Credentials;
 use Sdkgen\Client\CredentialsInterface;
-use Sdkgen\Client\Exception\FoundNoAccessTokenException;
-use Sdkgen\Client\Exception\InvalidAccessTokenException;
-use Sdkgen\Client\Exception\InvalidCredentialsException;
+use Sdkgen\Client\Exception\Authenticator\AccessTokenRequestException;
+use Sdkgen\Client\Exception\Authenticator\FoundNoAccessTokenException;
+use Sdkgen\Client\Exception\Authenticator\InvalidAccessTokenException;
+use Sdkgen\Client\Exception\Authenticator\InvalidCredentialsException;
 use Sdkgen\Client\HttpClientFactory;
 use Sdkgen\Client\TokenStore\MemoryTokenStore;
 use Sdkgen\Client\TokenStoreInterface;
@@ -51,10 +52,10 @@ class OAuth2 implements AuthenticatorInterface
     }
 
     /**
-     * @throws InvalidCredentialsException
+     * @throws AccessTokenRequestException
      * @throws FoundNoAccessTokenException
-     * @throws GuzzleException
      * @throws InvalidAccessTokenException
+     * @throws InvalidCredentialsException
      */
     public function __invoke(RequestInterface $request): RequestInterface
     {
@@ -103,11 +104,9 @@ class OAuth2 implements AuthenticatorInterface
     }
 
     /**
-     * @param string $code
-     * @return AccessToken
+     * @throws AccessTokenRequestException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function fetchAccessTokenByCode(string $code): AccessToken
     {
@@ -117,32 +116,31 @@ class OAuth2 implements AuthenticatorInterface
 
         $credentials = new Credentials\HttpBasic($this->credentials->getClientId(), $this->credentials->getClientSecret());
 
-        $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
-            'headers' => [
-                'User-Agent' => ClientAbstract::USER_AGENT,
-                'Accept' => 'application/json',
-            ],
-            'form_params' => [
-                'grant_type' => 'authorization_code',
-                'code' => $code,
-            ]
-        ]);
+        try {
+            $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
+                'headers' => [
+                    'User-Agent' => ClientAbstract::USER_AGENT,
+                    'Accept' => 'application/json',
+                ],
+                'form_params' => [
+                    'grant_type' => 'authorization_code',
+                    'code' => $code,
+                ]
+            ]);
 
-        return $this->parseTokenResponse($response);
+            return $this->parseTokenResponse($response);
+        } catch (GuzzleException $e) {
+            throw new AccessTokenRequestException('Could not request access token: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @return AccessToken
+     * @throws AccessTokenRequestException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function fetchAccessTokenByClientCredentials(): AccessToken
     {
-        if (!$this->credentials instanceof Credentials\ClientCredentials) {
-            throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 client credentials flow');
-        }
-
         $credentials = new Credentials\HttpBasic($this->credentials->getClientId(), $this->credentials->getClientSecret());
 
         $parameters = [
@@ -153,51 +151,54 @@ class OAuth2 implements AuthenticatorInterface
             $parameters['scope'] = implode(',', $this->scopes);
         }
 
-        $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
-            'headers' => [
-                'User-Agent' => ClientAbstract::USER_AGENT,
-                'Accept' => 'application/json',
-            ],
-            'form_params' => $parameters
-        ]);
+        try {
+            $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
+                'headers' => [
+                    'User-Agent' => ClientAbstract::USER_AGENT,
+                    'Accept' => 'application/json',
+                ],
+                'form_params' => $parameters
+            ]);
 
-        return $this->parseTokenResponse($response);
+            return $this->parseTokenResponse($response);
+        } catch (GuzzleException $e) {
+            throw new AccessTokenRequestException('Could not request access token: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @param string $refreshToken
-     * @return AccessToken
+     * @throws AccessTokenRequestException
      * @throws FoundNoAccessTokenException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function fetchAccessTokenByRefresh(string $refreshToken): AccessToken
     {
         $credentials = new Credentials\HttpBearer($this->getAccessToken(false, 0));
 
-        $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
-            'headers' => [
-                'User-Agent' => ClientAbstract::USER_AGENT,
-                'Accept' => 'application/json',
-            ],
-            'form_params' => [
-                'grant_type' => 'refresh_token',
-                'refresh_token' => $refreshToken,
-            ]
-        ]);
+        try {
+            $response = $this->newHttpClient($credentials)->post($this->credentials->getTokenUrl(), [
+                'headers' => [
+                    'User-Agent' => ClientAbstract::USER_AGENT,
+                    'Accept' => 'application/json',
+                ],
+                'form_params' => [
+                    'grant_type' => 'refresh_token',
+                    'refresh_token' => $refreshToken,
+                ]
+            ]);
 
-        return $this->parseTokenResponse($response);
+            return $this->parseTokenResponse($response);
+        } catch (GuzzleException $e) {
+            throw new AccessTokenRequestException('Could not request access token: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @param bool $automaticRefresh
-     * @param int $expireThreshold
-     * @return string
+     * @throws AccessTokenRequestException
      * @throws FoundNoAccessTokenException
      * @throws InvalidAccessTokenException
      * @throws InvalidCredentialsException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function getAccessToken(bool $automaticRefresh = true, int $expireThreshold = self::EXPIRE_THRESHOLD): string
     {
@@ -223,10 +224,7 @@ class OAuth2 implements AuthenticatorInterface
         return $accessToken->getAccessToken();
     }
 
-
     /**
-     * @param ResponseInterface $response
-     * @return AccessToken
      * @throws InvalidAccessTokenException
      */
     private function parseTokenResponse(ResponseInterface $response): AccessToken

@@ -9,14 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Sdkgen\Client\Exception;
+namespace Sdkgen\Client\Exception\Authenticator;
+
+use Sdkgen\Client\Exception\ClientException;
 
 /**
- * InvalidCredentialsException
+ * FoundNoAccessTokenException
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class InvalidCredentialsException extends ClientException
+class FoundNoAccessTokenException extends ClientException
 {
 }

@@ -13,7 +13,7 @@ namespace Sdkgen\Client;
 
 use GuzzleHttp\Client;
 use PSX\Schema\SchemaManager;
-use Sdkgen\Client\Exception\InvalidCredentialsException;
+use Sdkgen\Client\Exception\Authenticator\InvalidCredentialsException;
 
 /**
  * ClientAbstract

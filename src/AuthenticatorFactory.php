@@ -11,7 +11,7 @@
 
 namespace Sdkgen\Client;
 
-use Sdkgen\Client\Exception\InvalidCredentialsException;
+use Sdkgen\Client\Exception\Authenticator\InvalidCredentialsException;
 
 /**
  * AuthenticatorFactory

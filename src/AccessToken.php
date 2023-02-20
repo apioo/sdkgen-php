@@ -11,7 +11,7 @@
 
 namespace Sdkgen\Client;
 
-use Sdkgen\Client\Exception\InvalidAccessTokenException;
+use Sdkgen\Client\Exception\Authenticator\InvalidAccessTokenException;
 
 /**
  * AccessToken
