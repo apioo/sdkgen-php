@@ -24,9 +24,6 @@ abstract class ClientAbstract
 {
     public const USER_AGENT = 'SDKgen Client v1.0';
 
-    protected string $baseUrl;
-
-    protected AuthenticatorInterface $authenticator;
     protected Client $httpClient;
     protected Parser $parser;
 
@@ -35,19 +32,7 @@ abstract class ClientAbstract
      */
     public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null)
     {
-        $this->baseUrl = $baseUrl;
-        $this->authenticator = AuthenticatorFactory::factory($credentials ?? new Credentials\Anonymous());
-        $this->httpClient = (new HttpClientFactory($this->authenticator))->factory();
+        $this->httpClient = (new HttpClientFactory(AuthenticatorFactory::factory($credentials ?? new Credentials\Anonymous())))->factory();
         $this->parser = new Parser($baseUrl);
-    }
-
-    /**
-     * The authenticator is a service which is able to obtain an access token i.e. via an OAuth2 flow. If you provide
-     * already a fix access token like a bearer token you probably don`t need this service, it is only needed in case
-     * you want to obtain an access token
-     */
-    public function getAuthenticator(): AuthenticatorInterface
-    {
-        return $this->authenticator;
     }
 }
