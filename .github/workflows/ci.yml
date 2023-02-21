@@ -18,3 +18,23 @@ jobs:
         run: composer install --no-interaction --no-ansi --no-progress
       - name: Run Psalm
         run: vendor/bin/psalm --no-progress --shepherd --show-info=false --stats
+  phpunit:
+    name: "PHPUnit (PHP: ${{ matrix.php-versions }})"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions:
+          - 8.0
+          - 8.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          coverage: none
+      - name: Composer install
+        run: composer install --no-interaction --no-ansi --no-progress
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
