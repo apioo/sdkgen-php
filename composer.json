@@ -27,5 +27,10 @@
     "psr-4": {
       "Sdkgen\\Client\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Sdkgen\\Client\\Tests\\": "tests/"
+    }
   }
 }

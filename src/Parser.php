@@ -11,6 +11,9 @@
 
 namespace Sdkgen\Client;
 
+use PSX\DateTime\Date;
+use PSX\DateTime\DateTime;
+use PSX\DateTime\Time;
 use PSX\Json\Parser as JsonParser;
 use PSX\Schema\Exception\InvalidSchemaException;
 use PSX\Schema\Exception\ValidationException;
@@ -32,13 +35,13 @@ class Parser
 
     public function __construct(string $baseUrl)
     {
-        $this->baseUrl = $baseUrl;
+        $this->baseUrl = rtrim($baseUrl, '/');
         $this->schemaManager = new SchemaManager();
     }
 
     public function url(string $path, array $parameters): string
     {
-        return $this->substituteParameters(rtrim($this->baseUrl, '/') . '/' . ltrim($path, '/'), $parameters);
+        return $this->baseUrl . '/' . $this->substituteParameters($path, $parameters);
     }
 
     /**
@@ -67,30 +70,54 @@ class Parser
                 continue;
             }
 
-            if ($value instanceof \DateTimeInterface) {
-                $value = $value->format(\DateTimeInterface::RFC3339);
-            }
-
-            $result[$name] = $value;
+            $result[$name] = $this->toString($value);
         }
 
         return $result;
     }
 
-    private function substituteParameters(string $url, array $parameters): string
+    private function substituteParameters(string $path, array $parameters): string
     {
-        foreach ($parameters as $name => $value) {
-            if ($value === null) {
+        $parts = explode('/', $path);
+        $result = [];
+
+        foreach ($parts as $part) {
+            if ($part === '') {
                 continue;
             }
 
-            if ($value instanceof \DateTimeInterface) {
-                $value = $value->format(\DateTimeInterface::RFC3339);
+            $name = null;
+            if (str_starts_with($part, ':')) {
+                $name = substr($part, 1);
+            } elseif (str_starts_with($part, '$')) {
+                $pos  = strpos($part, '<');
+                $name = substr($part, 1, $pos - 1);
+            } elseif (str_starts_with($part, '{') && str_ends_with($part, '}')) {
+                $name = substr($part, 1, -1);
             }
 
-            $url = str_replace(':' . $name, $value, $url);
+            if ($name !== null && isset($parameters[$name])) {
+                $part = $this->toString($parameters[$name]);
+            }
+
+            $result[] = $part;
         }
 
-        return $url;
+        return implode('/', $result);
+    }
+
+    private function toString(mixed $value): string
+    {
+        if ($value instanceof Date) {
+            return $value->toString();
+        } elseif ($value instanceof Time) {
+            return $value->toString();
+        } elseif ($value instanceof DateTime) {
+            return $value->toString();
+        } elseif ($value instanceof \DateTimeInterface) {
+            return $value->format(\DateTimeInterface::RFC3339);
+        }
+
+        return (string) $value;
     }
 }
