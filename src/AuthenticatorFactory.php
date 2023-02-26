@@ -32,7 +32,7 @@ class AuthenticatorFactory
             return new Authenticator\HttpBearerAuthenticator($credentials);
         } elseif ($credentials instanceof Credentials\ApiKey) {
             return new Authenticator\ApiKeyAuthenticator($credentials);
-        } elseif ($credentials instanceof Credentials\OAuth2Abstract) {
+        } elseif ($credentials instanceof Credentials\OAuth2) {
             return new Authenticator\OAuth2Authenticator($credentials);
         } elseif ($credentials instanceof Credentials\Anonymous) {
             return new Authenticator\AnonymousAuthenticator($credentials);

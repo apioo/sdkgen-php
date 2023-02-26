@@ -39,11 +39,11 @@ class OAuth2Authenticator implements AuthenticatorInterface
 {
     private const EXPIRE_THRESHOLD = 60 * 10;
 
-    private Credentials\OAuth2Abstract $credentials;
+    private Credentials\OAuth2 $credentials;
     private TokenStoreInterface $tokenStore;
     private ?array $scopes;
 
-    public function __construct(Credentials\OAuth2Abstract $credentials)
+    public function __construct(Credentials\OAuth2 $credentials)
     {
         $this->credentials = $credentials;
         $this->tokenStore = $credentials->getTokenStore() ?? new MemoryTokenStore();
@@ -68,15 +68,9 @@ class OAuth2Authenticator implements AuthenticatorInterface
      * url already at the app
      *
      * This method constructs a redirect url where you can redirect your user to grant access
-     *
-     * @throws InvalidCredentialsException
      */
     public function buildRedirectUrl(?string $redirectUrl = null, ?array $scopes = [], ?string $state = null): string
     {
-        if (!$this->credentials instanceof Credentials\AuthorizationCode) {
-            throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 authorization code flow');
-        }
-
         $parameters = [
             'response_type' => 'code',
             'client_id' => $this->credentials->getClientId(),
@@ -109,10 +103,6 @@ class OAuth2Authenticator implements AuthenticatorInterface
      */
     protected function fetchAccessTokenByCode(string $code): AccessToken
     {
-        if (!$this->credentials instanceof Credentials\AuthorizationCode) {
-            throw new InvalidCredentialsException('The configured credentials do not support the OAuth2 authorization code flow');
-        }
-
         $credentials = new Credentials\HttpBasic($this->credentials->getClientId(), $this->credentials->getClientSecret());
 
         try {
@@ -201,12 +191,8 @@ class OAuth2Authenticator implements AuthenticatorInterface
         $timestamp = time();
 
         $accessToken = $this->tokenStore->get();
-        if ((!$accessToken instanceof AccessToken || $accessToken->getExpiresIn() < $timestamp) && $this->credentials instanceof Credentials\ClientCredentials) {
+        if (!$accessToken instanceof AccessToken || $accessToken->getExpiresIn() < $timestamp) {
             $accessToken = $this->fetchAccessTokenByClientCredentials();
-        }
-
-        if (!$accessToken instanceof AccessToken) {
-            throw new FoundNoAccessTokenException('Found no access token, please obtain an access token before making a request');
         }
 
         if ($accessToken->getExpiresIn() > ($timestamp + $expireThreshold)) {

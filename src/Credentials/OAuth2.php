@@ -20,7 +20,7 @@ use Sdkgen\Client\TokenStoreInterface;
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-abstract class OAuth2Abstract implements CredentialsInterface
+class OAuth2 implements CredentialsInterface
 {
     private string $clientId;
     private string $clientSecret;
