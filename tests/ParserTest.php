@@ -13,6 +13,8 @@ namespace Sdkgen\Client\Tests;
 
 use PHPUnit\Framework\TestCase;
 use PSX\DateTime\Date;
+use PSX\DateTime\DateTime;
+use PSX\DateTime\Time;
 use Sdkgen\Client\Parser;
 
 /**
@@ -28,10 +30,21 @@ class ParserTest extends TestCase
         $parser = new Parser('https://api.acme.com/');
 
         $this->assertEquals('https://api.acme.com/foo/bar', $parser->url('/foo/bar', []));
-        $this->assertEquals('https://api.acme.com/foo/1', $parser->url('/foo/:bar', ['bar' => 1]));
         $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/:bar', ['bar' => 'foo']));
-        $this->assertEquals('https://api.acme.com/foo/2020', $parser->url('/foo/$year<[0-9]+>', ['year' => '2020']));
+        $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/$bar<[0-9]+>', ['bar' => 'foo']));
         $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/{bar}', ['bar' => 'foo']));
+        $this->assertEquals('https://api.acme.com/foo/foo/bar', $parser->url('/foo/:bar/bar', ['bar' => 'foo']));
+        $this->assertEquals('https://api.acme.com/foo/foo/bar', $parser->url('/foo/$bar<[0-9]+>/bar', ['bar' => 'foo']));
+        $this->assertEquals('https://api.acme.com/foo/foo/bar', $parser->url('/foo/{bar}/bar', ['bar' => 'foo']));
+
+        $this->assertEquals('https://api.acme.com/foo/', $parser->url('/foo/:bar', ['bar' => null]));
+        $this->assertEquals('https://api.acme.com/foo/1337', $parser->url('/foo/:bar', ['bar' => 1337]));
+        $this->assertEquals('https://api.acme.com/foo/13.37', $parser->url('/foo/:bar', ['bar' => 13.37]));
+        $this->assertEquals('https://api.acme.com/foo/1', $parser->url('/foo/:bar', ['bar' => true]));
+        $this->assertEquals('https://api.acme.com/foo/0', $parser->url('/foo/:bar', ['bar' => false]));
+        $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/:bar', ['bar' => 'foo']));
         $this->assertEquals('https://api.acme.com/foo/2023-02-21', $parser->url('/foo/:bar', ['bar' => new Date('2023-02-21')]));
+        $this->assertEquals('https://api.acme.com/foo/2023-02-21T19:19:00Z', $parser->url('/foo/:bar', ['bar' => new DateTime('2023-02-21T19:19:00')]));
+        $this->assertEquals('https://api.acme.com/foo/19:19:00', $parser->url('/foo/:bar', ['bar' => new Time('19:19:00')]));
     }
 }

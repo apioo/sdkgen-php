@@ -35,7 +35,7 @@ class Parser
 
     public function __construct(string $baseUrl)
     {
-        $this->baseUrl = rtrim($baseUrl, '/');
+        $this->baseUrl = $this->normalizeBaseUrl($baseUrl);
         $this->schemaManager = new SchemaManager();
     }
 
@@ -96,7 +96,7 @@ class Parser
                 $name = substr($part, 1, -1);
             }
 
-            if ($name !== null && isset($parameters[$name])) {
+            if ($name !== null && array_key_exists($name, $parameters)) {
                 $part = $this->toString($parameters[$name]);
             }
 
@@ -108,7 +108,15 @@ class Parser
 
     private function toString(mixed $value): string
     {
-        if ($value instanceof Date) {
+        if (is_string($value)) {
+            return $value;
+        } elseif (is_float($value)) {
+            return '' . $value;
+        } elseif (is_int($value)) {
+            return '' . $value;
+        } elseif (is_bool($value)) {
+            return $value ? '1' : '0';
+        } elseif ($value instanceof Date) {
             return $value->toString();
         } elseif ($value instanceof Time) {
             return $value->toString();
@@ -116,8 +124,13 @@ class Parser
             return $value->toString();
         } elseif ($value instanceof \DateTimeInterface) {
             return $value->format(\DateTimeInterface::RFC3339);
+        } else {
+            return "";
         }
+    }
 
-        return (string) $value;
+    private function normalizeBaseUrl(string $baseUrl): string
+    {
+        return rtrim($baseUrl, '/');
     }
 }
