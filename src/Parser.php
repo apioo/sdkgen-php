@@ -91,7 +91,7 @@ class Parser
                 $name = substr($part, 1);
             } elseif (str_starts_with($part, '$')) {
                 $pos  = strpos($part, '<');
-                $name = substr($part, 1, $pos - 1);
+                $name = $pos !== false ? substr($part, 1, $pos - 1) : substr($part, 1);
             } elseif (str_starts_with($part, '{') && str_ends_with($part, '}')) {
                 $name = substr($part, 1, -1);
             }

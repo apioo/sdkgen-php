@@ -32,9 +32,11 @@ class ParserTest extends TestCase
         $this->assertEquals('https://api.acme.com/foo/bar', $parser->url('/foo/bar', []));
         $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/:bar', ['bar' => 'foo']));
         $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/$bar<[0-9]+>', ['bar' => 'foo']));
+        $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/$bar', ['bar' => 'foo']));
         $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/{bar}', ['bar' => 'foo']));
         $this->assertEquals('https://api.acme.com/foo/foo/bar', $parser->url('/foo/:bar/bar', ['bar' => 'foo']));
         $this->assertEquals('https://api.acme.com/foo/foo/bar', $parser->url('/foo/$bar<[0-9]+>/bar', ['bar' => 'foo']));
+        $this->assertEquals('https://api.acme.com/foo/foo/bar', $parser->url('/foo/$bar/bar', ['bar' => 'foo']));
         $this->assertEquals('https://api.acme.com/foo/foo/bar', $parser->url('/foo/{bar}/bar', ['bar' => 'foo']));
 
         $this->assertEquals('https://api.acme.com/foo/', $parser->url('/foo/:bar', ['bar' => null]));
