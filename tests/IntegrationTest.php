@@ -54,33 +54,7 @@ class IntegrationTest extends TestCase
     {
         $client = Client::build('my_token');
 
-        $objectFoo = new TestObject();
-        $objectFoo->setId(1);
-        $objectFoo->setName('foo');
-
-        $objectBar = new TestObject();
-        $objectBar->setId(2);
-        $objectBar->setName('bar');
-
-        $mapScalar = new TestMapScalar();
-        $mapScalar['foo'] = 'bar';
-        $mapScalar['bar'] = 'foo';
-
-        $mapObject = new TestMapObject();
-        $mapObject['foo'] = $objectFoo;
-        $mapObject['bar'] = $objectBar;
-
-        $payload = new TestRequest();
-        $payload->setInt(1337);
-        $payload->setFloat(13.37);
-        $payload->setString('foobar');
-        $payload->setBool(true);
-        $payload->setArrayScalar(['foo', 'bar']);
-        $payload->setArrayObject([$objectFoo, $objectBar]);
-        $payload->setMapScalar($mapScalar);
-        $payload->setMapObject($mapObject);
-        $payload->setObject($objectFoo);
-
+        $payload = $this->newPayload();
         $response = $client->create($payload);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
@@ -95,33 +69,7 @@ class IntegrationTest extends TestCase
     {
         $client = Client::build('my_token');
 
-        $objectFoo = new TestObject();
-        $objectFoo->setId(1);
-        $objectFoo->setName('foo');
-
-        $objectBar = new TestObject();
-        $objectBar->setId(2);
-        $objectBar->setName('bar');
-
-        $mapScalar = new TestMapScalar();
-        $mapScalar['foo'] = 'bar';
-        $mapScalar['bar'] = 'foo';
-
-        $mapObject = new TestMapObject();
-        $mapObject['foo'] = $objectFoo;
-        $mapObject['bar'] = $objectBar;
-
-        $payload = new TestRequest();
-        $payload->setInt(1337);
-        $payload->setFloat(13.37);
-        $payload->setString('foobar');
-        $payload->setBool(true);
-        $payload->setArrayScalar(['foo', 'bar']);
-        $payload->setArrayObject([$objectFoo, $objectBar]);
-        $payload->setMapScalar($mapScalar);
-        $payload->setMapObject($mapObject);
-        $payload->setObject($objectFoo);
-
+        $payload = $this->newPayload();
         $response = $client->update(1, $payload);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
@@ -136,33 +84,7 @@ class IntegrationTest extends TestCase
     {
         $client = Client::build('my_token');
 
-        $objectFoo = new TestObject();
-        $objectFoo->setId(1);
-        $objectFoo->setName('foo');
-
-        $objectBar = new TestObject();
-        $objectBar->setId(2);
-        $objectBar->setName('bar');
-
-        $mapScalar = new TestMapScalar();
-        $mapScalar['foo'] = 'bar';
-        $mapScalar['bar'] = 'foo';
-
-        $mapObject = new TestMapObject();
-        $mapObject['foo'] = $objectFoo;
-        $mapObject['bar'] = $objectBar;
-
-        $payload = new TestRequest();
-        $payload->setInt(1337);
-        $payload->setFloat(13.37);
-        $payload->setString('foobar');
-        $payload->setBool(true);
-        $payload->setArrayScalar(['foo', 'bar']);
-        $payload->setArrayObject([$objectFoo, $objectBar]);
-        $payload->setMapScalar($mapScalar);
-        $payload->setMapObject($mapObject);
-        $payload->setObject($objectFoo);
-
+        $payload = $this->newPayload();
         $response = $client->patch(1, $payload);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
@@ -185,5 +107,37 @@ class IntegrationTest extends TestCase
         $this->assertEquals('DELETE', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getProperties());
         $this->assertEquals(null, $response->getJson());
+    }
+
+    private function newPayload(): TestRequest
+    {
+        $objectFoo = new TestObject();
+        $objectFoo->setId(1);
+        $objectFoo->setName('foo');
+
+        $objectBar = new TestObject();
+        $objectBar->setId(2);
+        $objectBar->setName('bar');
+
+        $mapScalar = new TestMapScalar();
+        $mapScalar['foo'] = 'bar';
+        $mapScalar['bar'] = 'foo';
+
+        $mapObject = new TestMapObject();
+        $mapObject['foo'] = $objectFoo;
+        $mapObject['bar'] = $objectBar;
+
+        $payload = new TestRequest();
+        $payload->setInt(1337);
+        $payload->setFloat(13.37);
+        $payload->setString('foobar');
+        $payload->setBool(true);
+        $payload->setArrayScalar(['foo', 'bar']);
+        $payload->setArrayObject([$objectFoo, $objectBar]);
+        $payload->setMapScalar($mapScalar);
+        $payload->setMapObject($mapObject);
+        $payload->setObject($objectFoo);
+
+        return $payload;
     }
 }
