@@ -11,12 +11,9 @@
 
 namespace Sdkgen\Client;
 
-use PSX\DateTime\Date;
-use PSX\DateTime\DateTime;
 use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
-use PSX\DateTime\Time;
 use PSX\Json\Parser as JsonParser;
 use PSX\Schema\Exception\InvalidSchemaException;
 use PSX\Schema\Exception\ValidationException;
