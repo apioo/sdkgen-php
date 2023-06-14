@@ -13,6 +13,9 @@ namespace Sdkgen\Client;
 
 use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\LocalTime;
 use PSX\DateTime\Time;
 use PSX\Json\Parser as JsonParser;
 use PSX\Schema\Exception\InvalidSchemaException;
@@ -116,11 +119,11 @@ class Parser
             return '' . $value;
         } elseif (is_bool($value)) {
             return $value ? '1' : '0';
-        } elseif ($value instanceof Date) {
+        } elseif ($value instanceof LocalDate) {
             return $value->toString();
-        } elseif ($value instanceof Time) {
+        } elseif ($value instanceof LocalTime) {
             return $value->toString();
-        } elseif ($value instanceof DateTime) {
+        } elseif ($value instanceof LocalDateTime) {
             return $value->toString();
         } elseif ($value instanceof \DateTimeInterface) {
             return $value->format(\DateTimeInterface::RFC3339);

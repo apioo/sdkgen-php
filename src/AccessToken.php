@@ -73,8 +73,6 @@ class AccessToken
     }
 
     /**
-     * @param array $data
-     * @return static
      * @throws InvalidAccessTokenException
      */
     public static function fromArray(array $data): self

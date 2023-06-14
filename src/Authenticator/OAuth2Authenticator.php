@@ -90,7 +90,7 @@ class OAuth2Authenticator implements AuthenticatorInterface
             $parameters['state'] = $state;
         }
 
-        $url = new Url($this->credentials->getAuthorizationUrl());
+        $url = Url::parse($this->credentials->getAuthorizationUrl());
         $url = $url->withParameters(array_merge($url->getParameters(), $parameters));
 
         return $url->toString();
