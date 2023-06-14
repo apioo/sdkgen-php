@@ -12,9 +12,9 @@
 namespace Sdkgen\Client\Tests;
 
 use PHPUnit\Framework\TestCase;
-use PSX\DateTime\Date;
-use PSX\DateTime\DateTime;
-use PSX\DateTime\Time;
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\LocalTime;
 use Sdkgen\Client\Parser;
 
 /**
@@ -45,8 +45,8 @@ class ParserTest extends TestCase
         $this->assertEquals('https://api.acme.com/foo/1', $parser->url('/foo/:bar', ['bar' => true]));
         $this->assertEquals('https://api.acme.com/foo/0', $parser->url('/foo/:bar', ['bar' => false]));
         $this->assertEquals('https://api.acme.com/foo/foo', $parser->url('/foo/:bar', ['bar' => 'foo']));
-        $this->assertEquals('https://api.acme.com/foo/2023-02-21', $parser->url('/foo/:bar', ['bar' => new Date('2023-02-21')]));
-        $this->assertEquals('https://api.acme.com/foo/2023-02-21T19:19:00Z', $parser->url('/foo/:bar', ['bar' => new DateTime('2023-02-21T19:19:00')]));
-        $this->assertEquals('https://api.acme.com/foo/19:19:00', $parser->url('/foo/:bar', ['bar' => new Time('19:19:00')]));
+        $this->assertEquals('https://api.acme.com/foo/2023-02-21', $parser->url('/foo/:bar', ['bar' => LocalDate::parse('2023-02-21')]));
+        $this->assertEquals('https://api.acme.com/foo/2023-02-21T19:19:00Z', $parser->url('/foo/:bar', ['bar' => LocalDateTime::parse('2023-02-21T19:19:00')]));
+        $this->assertEquals('https://api.acme.com/foo/19:19:00', $parser->url('/foo/:bar', ['bar' => LocalTime::parse('19:19:00')]));
     }
 }
