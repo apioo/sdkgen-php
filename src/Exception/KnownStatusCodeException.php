@@ -19,5 +19,5 @@ namespace Sdkgen\Client\Exception;
  */
 abstract class KnownStatusCodeException extends ClientException
 {
-    abstract public function getPayload();
+    abstract public function getPayload(): mixed;
 }
