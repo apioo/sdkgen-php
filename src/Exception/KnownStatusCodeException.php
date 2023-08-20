@@ -17,6 +17,7 @@ namespace Sdkgen\Client\Exception;
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app
  */
-class KnownStatusCodeException extends ClientException
+abstract class KnownStatusCodeException extends ClientException
 {
+    abstract public function getPayload();
 }
