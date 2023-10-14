@@ -40,7 +40,7 @@ class IntegrationTest extends TestCase
     {
         $client = Client::build('my_token');
 
-        $response = $client->getAll(8, 16, 'foobar');
+        $response = $client->product()->getAll(8, 16, 'foobar');
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
@@ -55,7 +55,7 @@ class IntegrationTest extends TestCase
         $client = Client::build('my_token');
 
         $payload = $this->newPayload();
-        $response = $client->create($payload);
+        $response = $client->product()->create($payload);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
@@ -70,7 +70,7 @@ class IntegrationTest extends TestCase
         $client = Client::build('my_token');
 
         $payload = $this->newPayload();
-        $response = $client->update(1, $payload);
+        $response = $client->product()->update(1, $payload);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
@@ -85,7 +85,7 @@ class IntegrationTest extends TestCase
         $client = Client::build('my_token');
 
         $payload = $this->newPayload();
-        $response = $client->patch(1, $payload);
+        $response = $client->product()->patch(1, $payload);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
@@ -99,7 +99,7 @@ class IntegrationTest extends TestCase
     {
         $client = Client::build('my_token');
 
-        $response = $client->delete(1);
+        $response = $client->product()->delete(1);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
