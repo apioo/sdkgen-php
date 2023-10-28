@@ -61,6 +61,25 @@ class AccessToken
         return $this->scope;
     }
 
+    public function hasRefreshToken(): bool
+    {
+        return !empty($this->refreshToken);
+    }
+
+    public function getExpiresInTimestamp(): int
+    {
+        $nowTimestamp = time();
+
+        $expiresIn = $this->getExpiresIn();
+        if ($expiresIn < 529196400) {
+            // in case the expires in is lower than 1986-10-09 we assume that the field represents the duration in seconds
+            // otherwise it is probably a timestamp
+            $expiresIn = $nowTimestamp + $expiresIn;
+        }
+
+        return $expiresIn;
+    }
+
     public function toArray(): array
     {
         return [

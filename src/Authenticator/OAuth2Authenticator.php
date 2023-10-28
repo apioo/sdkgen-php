@@ -191,15 +191,15 @@ class OAuth2Authenticator implements AuthenticatorInterface
         $timestamp = time();
 
         $accessToken = $this->tokenStore->get();
-        if (!$accessToken instanceof AccessToken || $accessToken->getExpiresIn() < $timestamp) {
+        if (!$accessToken instanceof AccessToken || $accessToken->getExpiresInTimestamp() < $timestamp) {
             $accessToken = $this->fetchAccessTokenByClientCredentials();
         }
 
-        if ($accessToken->getExpiresIn() > ($timestamp + $expireThreshold)) {
+        if ($accessToken->getExpiresInTimestamp() > ($timestamp + $expireThreshold)) {
             return $accessToken->getAccessToken();
         }
 
-        if ($automaticRefresh && $accessToken->getRefreshToken()) {
+        if ($automaticRefresh && $accessToken->hasRefreshToken()) {
             $accessToken = $this->fetchAccessTokenByRefresh($accessToken->getRefreshToken());
         }
 
