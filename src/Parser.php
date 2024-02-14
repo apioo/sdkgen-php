@@ -17,8 +17,10 @@ use PSX\DateTime\LocalTime;
 use PSX\Json\Parser as JsonParser;
 use PSX\Schema\Exception\InvalidSchemaException;
 use PSX\Schema\Exception\ValidationException;
+use PSX\Schema\Schema;
 use PSX\Schema\SchemaManager;
 use PSX\Schema\SchemaTraverser;
+use PSX\Schema\TypeFactory;
 use PSX\Schema\Visitor\TypeVisitor;
 use Sdkgen\Client\Exception\ParseException;
 
@@ -47,11 +49,18 @@ class Parser
     /**
      * @throws ParseException
      */
-    public function parse(string $data, string $class): mixed
+    public function parse(string $data, string $class, bool $isMap = false, bool $isArray = false): mixed
     {
         try {
             $data = JsonParser::decode($data);
+
             $schema = $this->schemaManager->getSchema($class);
+            if ($isMap) {
+                $schema = new Schema(TypeFactory::getMap($schema->getType()), $schema->getDefinitions());
+            } elseif ($isArray) {
+                $schema = new Schema(TypeFactory::getArray($schema->getType()), $schema->getDefinitions());
+            }
+
             return (new SchemaTraverser(false))->traverse($data, $schema, new TypeVisitor());
         } catch (\JsonException $e) {
             throw new ParseException('The server returned an in valid JSON format: ' . $e->getMessage(), 0, $e);
