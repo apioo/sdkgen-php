@@ -76,17 +76,17 @@ class OAuth2Authenticator implements AuthenticatorInterface
             'client_id' => $this->credentials->getClientId(),
         ];
 
-        if (!empty($redirectUrl)) {
+        if ($redirectUrl !== null) {
             $parameters['redirect_uri'] = $redirectUrl;
         }
 
-        if (!empty($scopes)) {
+        if ($scopes !== null) {
             $parameters['scope'] = implode(',', $scopes);
-        } elseif (!empty($this->scopes)) {
+        } elseif ($this->scopes !== null) {
             $parameters['scope'] = implode(',', $this->scopes);
         }
 
-        if (!empty($state)) {
+        if ($state !== null) {
             $parameters['state'] = $state;
         }
 
@@ -135,7 +135,7 @@ class OAuth2Authenticator implements AuthenticatorInterface
             'grant_type' => 'client_credentials',
         ];
 
-        if (!empty($this->scopes)) {
+        if ($this->scopes !== null) {
             $parameters['scope'] = implode(',', $this->scopes);
         }
 

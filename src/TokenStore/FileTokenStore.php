@@ -39,7 +39,7 @@ class FileTokenStore implements TokenStoreInterface
         }
 
         $raw = file_get_contents($file);
-        if (empty($raw)) {
+        if ($raw === false) {
             return null;
         }
 
