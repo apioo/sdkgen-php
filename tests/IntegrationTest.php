@@ -46,7 +46,7 @@ class IntegrationTest extends TestCase
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
         $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
         $this->assertEquals('GET', $response->getMethod());
-        $this->assertEquals(['startIndex' => 8, 'count' => 16, 'search' => 'foobar'], $response->getArgs()->getProperties());
+        $this->assertEquals(['startIndex' => 8, 'count' => 16, 'search' => 'foobar'], $response->getArgs()->getAll());
         $this->assertEquals(null, $response->getJson());
     }
 
@@ -61,7 +61,7 @@ class IntegrationTest extends TestCase
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
         $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
         $this->assertEquals('POST', $response->getMethod());
-        $this->assertEquals([], $response->getArgs()->getProperties());
+        $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
     }
 
@@ -76,7 +76,7 @@ class IntegrationTest extends TestCase
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
         $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
         $this->assertEquals('PUT', $response->getMethod());
-        $this->assertEquals([], $response->getArgs()->getProperties());
+        $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
     }
 
@@ -91,7 +91,7 @@ class IntegrationTest extends TestCase
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
         $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
         $this->assertEquals('PATCH', $response->getMethod());
-        $this->assertEquals([], $response->getArgs()->getProperties());
+        $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
     }
 
@@ -105,7 +105,7 @@ class IntegrationTest extends TestCase
         $this->assertEquals('application/json', $response->getHeaders()['Accept']);
         $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
         $this->assertEquals('DELETE', $response->getMethod());
-        $this->assertEquals([], $response->getArgs()->getProperties());
+        $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals(null, $response->getJson());
     }
 
