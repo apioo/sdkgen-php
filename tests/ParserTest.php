@@ -16,6 +16,7 @@ use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
 use Sdkgen\Client\Parser;
+use Sdkgen\Client\Tests\Generated\TestObject;
 
 /**
  * ParserTest
@@ -48,5 +49,38 @@ class ParserTest extends TestCase
         $this->assertEquals('https://api.acme.com/foo/2023-02-21', $parser->url('/foo/:bar', ['bar' => LocalDate::parse('2023-02-21')]));
         $this->assertEquals('https://api.acme.com/foo/2023-02-21T19:19:00Z', $parser->url('/foo/:bar', ['bar' => LocalDateTime::parse('2023-02-21T19:19:00')]));
         $this->assertEquals('https://api.acme.com/foo/19:19:00', $parser->url('/foo/:bar', ['bar' => LocalTime::parse('19:19:00')]));
+    }
+
+    public function testQuery(): void
+    {
+        $parser = new Parser('https://api.acme.com/');
+
+        $test = new TestObject();
+        $test->setName("foo");
+
+        $parameters = [
+            'null' => null,
+            'int' => 1337,
+            'float' => 13.37,
+            'true' => true,
+            'false' => false,
+            'string' => 'foo',
+            'date' => LocalDate::parse('2023-02-21'),
+            'datetime' => LocalDateTime::parse('2023-02-21T19:19:00'),
+            'time' => LocalTime::parse('19:19:00'),
+            'args' => $test,
+        ];
+
+        $result = $parser->query($parameters, ['args']);
+
+        $this->assertSame('1337', $result['int']);
+        $this->assertSame('13.37', $result['float']);
+        $this->assertSame('1', $result['true']);
+        $this->assertSame('0', $result['false']);
+        $this->assertSame('foo', $result['string']);
+        $this->assertSame('2023-02-21', $result['date']);
+        $this->assertSame('2023-02-21T19:19:00Z', $result['datetime']);
+        $this->assertSame('19:19:00', $result['time']);
+        $this->assertSame('foo', $result['name']);
     }
 }
