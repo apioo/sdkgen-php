@@ -15,6 +15,7 @@ use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
 use PSX\Json\Parser as JsonParser;
+use PSX\Record\RecordableInterface;
 use PSX\Schema\Exception\InvalidSchemaException;
 use PSX\Schema\Exception\ValidationException;
 use PSX\Schema\Schema;
@@ -71,7 +72,7 @@ class Parser
         }
     }
 
-    public function query(array $parameters): array
+    public function query(array $parameters, array $structNames = []): array
     {
         $result = [];
         foreach ($parameters as $name => $value) {
@@ -79,7 +80,15 @@ class Parser
                 continue;
             }
 
-            $result[$name] = $this->toString($value);
+            if (in_array($name, $structNames)) {
+                if ($value instanceof RecordableInterface) {
+                    foreach ($value->toRecord()->getAll() as $nestedName => $nestedValue) {
+                        $result[$nestedName] = $this->toString($nestedValue);
+                    }
+                }
+            } else {
+                $result[$name] = $this->toString($value);
+            }
         }
 
         return $result;
