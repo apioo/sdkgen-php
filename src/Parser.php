@@ -82,9 +82,7 @@ class Parser
 
             if (in_array($name, $structNames)) {
                 if ($value instanceof RecordableInterface) {
-                    foreach ($value->toRecord()->getAll() as $nestedName => $nestedValue) {
-                        $result[$nestedName] = $this->toString($nestedValue);
-                    }
+                    $result = array_merge($result, $this->query($value->toRecord()->getAll()));
                 }
             } else {
                 $result[$name] = $this->toString($value);
