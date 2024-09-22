@@ -11,7 +11,12 @@
 
 namespace Sdkgen\Client\Tests;
 
+use GuzzleHttp\Psr7\Stream;
 use PHPUnit\Framework\TestCase;
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\LocalTime;
+use PSX\Http\Stream\StringStream;
 use Sdkgen\Client\Tests\Generated\Client;
 use Sdkgen\Client\Tests\Generated\TestMapObject;
 use Sdkgen\Client\Tests\Generated\TestMapScalar;
@@ -36,77 +41,105 @@ class IntegrationTest extends TestCase
         }
     }
 
-    public function testClientGetAll()
+    public function testClientGetAll(): void
     {
         $client = Client::build('my_token');
 
         $response = $client->product()->getAll(8, 16, 'foobar');
 
-        $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
-        $this->assertEquals('application/json', $response->getHeaders()['Accept']);
-        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('GET', $response->getMethod());
         $this->assertEquals(['startIndex' => 8, 'count' => 16, 'search' => 'foobar'], $response->getArgs()->getAll());
         $this->assertEquals(null, $response->getJson());
     }
 
-    public function testClientCreate()
+    public function testClientCreate(): void
     {
         $client = Client::build('my_token');
 
         $payload = $this->newPayload();
         $response = $client->product()->create($payload);
 
-        $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
-        $this->assertEquals('application/json', $response->getHeaders()['Accept']);
-        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
     }
 
-    public function testClientUpdate()
+    public function testClientUpdate(): void
     {
         $client = Client::build('my_token');
 
         $payload = $this->newPayload();
         $response = $client->product()->update(1, $payload);
 
-        $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
-        $this->assertEquals('application/json', $response->getHeaders()['Accept']);
-        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('PUT', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
     }
 
-    public function testClientPatch()
+    public function testClientPatch(): void
     {
         $client = Client::build('my_token');
 
         $payload = $this->newPayload();
         $response = $client->product()->patch(1, $payload);
 
-        $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
-        $this->assertEquals('application/json', $response->getHeaders()['Accept']);
-        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('PATCH', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
     }
 
-    public function testClientDelete()
+    public function testClientDelete(): void
     {
         $client = Client::build('my_token');
 
         $response = $client->product()->delete(1);
 
-        $this->assertEquals('Bearer my_token', $response->getHeaders()['Authorization']);
-        $this->assertEquals('application/json', $response->getHeaders()['Accept']);
-        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()['User-Agent']);
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('DELETE', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals(null, $response->getJson());
+    }
+
+    public function testClientBinary(): void
+    {
+        $client = Client::build('my_token');
+
+        $payload = new StringStream('foobar');
+
+        $response = $client->product()->binary($payload);
+
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('POST', $response->getMethod());
+        $this->assertEquals('foobar', $response->getData());
+    }
+
+    public function testClientForm(): void
+    {
+        $client = Client::build('my_token');
+
+        $response = $client->product()->form(['foo' => 'bar']);
+
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('POST', $response->getMethod());
+        $this->assertEquals(['foo' => 'bar'], $response->getForm()?->getAll());
     }
 
     private function newPayload(): TestRequest
@@ -132,6 +165,9 @@ class IntegrationTest extends TestCase
         $payload->setFloat(13.37);
         $payload->setString('foobar');
         $payload->setBool(true);
+        $payload->setDateString(LocalDate::of(2024, 9, 22));
+        $payload->setDateTimeString(LocalDateTime::of(2024, 9, 22, 10, 9, 0));
+        $payload->setTimeString(LocalTime::of(10, 9, 0));
         $payload->setArrayScalar(['foo', 'bar']);
         $payload->setArrayObject([$objectFoo, $objectBar]);
         $payload->setMapScalar($mapScalar);
