@@ -12,6 +12,7 @@
 namespace Sdkgen\Client\Tests;
 
 use GuzzleHttp\Psr7\Stream;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
@@ -140,6 +141,50 @@ class IntegrationTest extends TestCase
         $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals(['foo' => 'bar'], $response->getForm()?->getAll());
+    }
+
+    public function testClientMultipart(): void
+    {
+        $client = Client::build('my_token');
+
+        $response = $client->product()->multipart([
+            [
+                'name' => 'foo',
+                'contents' => Utils::tryFopen(__DIR__ . '/upload.txt', 'r')
+            ],
+        ]);
+
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('POST', $response->getMethod());
+        $this->assertEquals(['foo' => 'foobar'], $response->getFiles()?->getAll());
+    }
+
+    public function testClientText(): void
+    {
+        $client = Client::build('my_token');
+
+        $response = $client->product()->text('foobar');
+
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('POST', $response->getMethod());
+        $this->assertEquals('foobar', $response->getData());
+    }
+
+    public function testClientXml(): void
+    {
+        $client = Client::build('my_token');
+
+        $response = $client->product()->xml('<foo>bar</foo>');
+
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('POST', $response->getMethod());
+        $this->assertEquals('<foo>bar</foo>', $response->getData());
     }
 
     private function newPayload(): TestRequest
