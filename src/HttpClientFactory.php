@@ -17,7 +17,7 @@ use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * AuthenticatorFactory
+ * HttpClientFactory
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  * @link   https://sdkgen.app

@@ -18,6 +18,7 @@ use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
 use PSX\Http\Stream\StringStream;
+use Sdkgen\Client\Multipart;
 use Sdkgen\Client\Tests\Generated\Client;
 use Sdkgen\Client\Tests\Generated\TestMapObject;
 use Sdkgen\Client\Tests\Generated\TestMapScalar;
@@ -143,16 +144,27 @@ class IntegrationTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $response->getForm()?->getAll());
     }
 
+    public function testClientJson(): void
+    {
+        $client = Client::build('my_token');
+
+        $response = $client->product()->json(['string' => 'bar']);
+
+        $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
+        $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
+        $this->assertEquals('SDKgen Client v1.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('POST', $response->getMethod());
+        $this->assertEquals('bar', $response->getJson()?->getString());
+    }
+
     public function testClientMultipart(): void
     {
         $client = Client::build('my_token');
 
-        $response = $client->product()->multipart([
-            [
-                'name' => 'foo',
-                'contents' => Utils::tryFopen(__DIR__ . '/upload.txt', 'r')
-            ],
-        ]);
+        $multipart = new Multipart();
+        $multipart->add('foo', Utils::tryFopen(__DIR__ . '/upload.txt', 'r'));
+
+        $response = $client->product()->multipart($multipart);
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
