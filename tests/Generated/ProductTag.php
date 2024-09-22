@@ -8,6 +8,7 @@ namespace Sdkgen\Client\Tests\Generated;
 
 use GuzzleHttp\Exception\BadResponseException;
 use Sdkgen\Client\Exception\ClientException;
+use Sdkgen\Client\Exception\Payload;
 use Sdkgen\Client\Exception\UnknownStatusCodeException;
 use Sdkgen\Client\TagAbstract;
 
@@ -28,27 +29,30 @@ class ProductTag extends TagAbstract
         ]);
 
         $options = [
+            'headers' => [
+            ],
             'query' => $this->parser->query([
                 'startIndex' => $startIndex,
                 'count' => $count,
                 'search' => $search,
+            ], [
             ]),
         ];
 
         try {
             $response = $this->httpClient->request('GET', $url, $options);
-            $data = (string) $response->getBody();
+            $body = $response->getBody();
 
-            return $this->parser->parse($data, TestResponse::class);
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
         } catch (ClientException $e) {
             throw $e;
         } catch (BadResponseException $e) {
-            $data = (string) $e->getResponse()->getBody();
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
 
-            switch ($e->getResponse()->getStatusCode()) {
-                default:
-                    throw new UnknownStatusCodeException('The server returned an unknown status code');
-            }
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
         } catch (\Throwable $e) {
             throw new ClientException('An unknown error occurred: ' . $e->getMessage());
         }
@@ -67,25 +71,29 @@ class ProductTag extends TagAbstract
         ]);
 
         $options = [
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
             'query' => $this->parser->query([
+            ], [
             ]),
             'json' => $payload
         ];
 
         try {
             $response = $this->httpClient->request('POST', $url, $options);
-            $data = (string) $response->getBody();
+            $body = $response->getBody();
 
-            return $this->parser->parse($data, TestResponse::class);
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
         } catch (ClientException $e) {
             throw $e;
         } catch (BadResponseException $e) {
-            $data = (string) $e->getResponse()->getBody();
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
 
-            switch ($e->getResponse()->getStatusCode()) {
-                default:
-                    throw new UnknownStatusCodeException('The server returned an unknown status code');
-            }
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
         } catch (\Throwable $e) {
             throw new ClientException('An unknown error occurred: ' . $e->getMessage());
         }
@@ -106,25 +114,29 @@ class ProductTag extends TagAbstract
         ]);
 
         $options = [
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
             'query' => $this->parser->query([
+            ], [
             ]),
             'json' => $payload
         ];
 
         try {
             $response = $this->httpClient->request('PUT', $url, $options);
-            $data = (string) $response->getBody();
+            $body = $response->getBody();
 
-            return $this->parser->parse($data, TestResponse::class);
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
         } catch (ClientException $e) {
             throw $e;
         } catch (BadResponseException $e) {
-            $data = (string) $e->getResponse()->getBody();
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
 
-            switch ($e->getResponse()->getStatusCode()) {
-                default:
-                    throw new UnknownStatusCodeException('The server returned an unknown status code');
-            }
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
         } catch (\Throwable $e) {
             throw new ClientException('An unknown error occurred: ' . $e->getMessage());
         }
@@ -145,25 +157,29 @@ class ProductTag extends TagAbstract
         ]);
 
         $options = [
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
             'query' => $this->parser->query([
+            ], [
             ]),
             'json' => $payload
         ];
 
         try {
             $response = $this->httpClient->request('PATCH', $url, $options);
-            $data = (string) $response->getBody();
+            $body = $response->getBody();
 
-            return $this->parser->parse($data, TestResponse::class);
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
         } catch (ClientException $e) {
             throw $e;
         } catch (BadResponseException $e) {
-            $data = (string) $e->getResponse()->getBody();
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
 
-            switch ($e->getResponse()->getStatusCode()) {
-                default:
-                    throw new UnknownStatusCodeException('The server returned an unknown status code');
-            }
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
         } catch (\Throwable $e) {
             throw new ClientException('An unknown error occurred: ' . $e->getMessage());
         }
@@ -183,28 +199,278 @@ class ProductTag extends TagAbstract
         ]);
 
         $options = [
+            'headers' => [
+            ],
             'query' => $this->parser->query([
+            ], [
             ]),
         ];
 
         try {
             $response = $this->httpClient->request('DELETE', $url, $options);
-            $data = (string) $response->getBody();
+            $body = $response->getBody();
 
-            return $this->parser->parse($data, TestResponse::class);
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
         } catch (ClientException $e) {
             throw $e;
         } catch (BadResponseException $e) {
-            $data = (string) $e->getResponse()->getBody();
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
 
-            switch ($e->getResponse()->getStatusCode()) {
-                default:
-                    throw new UnknownStatusCodeException('The server returned an unknown status code');
-            }
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
         } catch (\Throwable $e) {
             throw new ClientException('An unknown error occurred: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Test binary content type
+     *
+     * @param \Psr\Http\Message\StreamInterface $payload
+     * @return TestResponse
+     * @throws ClientException
+     */
+    public function binary(\Psr\Http\Message\StreamInterface $payload): TestResponse
+    {
+        $url = $this->parser->url('/anything/binary', [
+        ]);
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'application/octet-stream',
+            ],
+            'query' => $this->parser->query([
+            ], [
+            ]),
+            'body' => $payload
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, $options);
+            $body = $response->getBody();
+
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (BadResponseException $e) {
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
+
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
+        } catch (\Throwable $e) {
+            throw new ClientException('An unknown error occurred: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Test form content type
+     *
+     * @param array $payload
+     * @return TestResponse
+     * @throws ClientException
+     */
+    public function form(array $payload): TestResponse
+    {
+        $url = $this->parser->url('/anything/form', [
+        ]);
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ],
+            'query' => $this->parser->query([
+            ], [
+            ]),
+            'form_params' => $payload
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, $options);
+            $body = $response->getBody();
+
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (BadResponseException $e) {
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
+
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
+        } catch (\Throwable $e) {
+            throw new ClientException('An unknown error occurred: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Test json content type
+     *
+     * @param \stdClass $payload
+     * @return TestResponse
+     * @throws ClientException
+     */
+    public function json(\stdClass $payload): TestResponse
+    {
+        $url = $this->parser->url('/anything/json', [
+        ]);
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'query' => $this->parser->query([
+            ], [
+            ]),
+            'json' => $payload
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, $options);
+            $body = $response->getBody();
+
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (BadResponseException $e) {
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
+
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
+        } catch (\Throwable $e) {
+            throw new ClientException('An unknown error occurred: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Test json content type
+     *
+     * @param array $payload
+     * @return TestResponse
+     * @throws ClientException
+     */
+    public function multipart(array $payload): TestResponse
+    {
+        $url = $this->parser->url('/anything/multipart', [
+        ]);
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'multipart/form-data',
+            ],
+            'query' => $this->parser->query([
+            ], [
+            ]),
+            'multipart' => $payload
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, $options);
+            $body = $response->getBody();
+
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (BadResponseException $e) {
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
+
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
+        } catch (\Throwable $e) {
+            throw new ClientException('An unknown error occurred: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Test text content type
+     *
+     * @param string $payload
+     * @return TestResponse
+     * @throws ClientException
+     */
+    public function text(string $payload): TestResponse
+    {
+        $url = $this->parser->url('/anything/text', [
+        ]);
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'text/plain',
+            ],
+            'query' => $this->parser->query([
+            ], [
+            ]),
+            'body' => $payload
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, $options);
+            $body = $response->getBody();
+
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (BadResponseException $e) {
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
+
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
+        } catch (\Throwable $e) {
+            throw new ClientException('An unknown error occurred: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Test xml content type
+     *
+     * @param string $payload
+     * @return TestResponse
+     * @throws ClientException
+     */
+    public function xml(string $payload): TestResponse
+    {
+        $url = $this->parser->url('/anything/xml', [
+        ]);
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'application/xml',
+            ],
+            'query' => $this->parser->query([
+            ], [
+            ]),
+            'body' => $payload
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, $options);
+            $body = $response->getBody();
+
+            $data = $this->parser->parse((string) $body, TestResponse::class);
+
+            return $data;
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (BadResponseException $e) {
+            $body = $e->getResponse()->getBody();
+            $statusCode = $e->getResponse()->getStatusCode();
+
+            throw new UnknownStatusCodeException('The server returned an unknown status code: ' . $statusCode);
+        } catch (\Throwable $e) {
+            throw new ClientException('An unknown error occurred: ' . $e->getMessage());
+        }
+    }
+
 
 
 }
