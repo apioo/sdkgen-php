@@ -15,7 +15,7 @@
     "php": ">=8.1",
     "psx/json": "^3.0",
     "psx/model": "^5.0",
-    "psx/schema": "^5.0|^6.0",
+    "psx/schema": "^5.0|^6.0|^7.0",
     "guzzlehttp/guzzle": "^7.4",
     "psr/simple-cache": "^3.0"
   },
