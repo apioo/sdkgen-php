@@ -14,15 +14,11 @@ namespace Sdkgen\Client;
 use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
-use PSX\Json\Parser as JsonParser;
 use PSX\Record\RecordableInterface;
-use PSX\Schema\Exception\InvalidSchemaException;
-use PSX\Schema\Exception\ValidationException;
-use PSX\Schema\Schema;
+use PSX\Schema\Exception\MappingException;
+use PSX\Schema\ObjectMapper;
 use PSX\Schema\SchemaManager;
-use PSX\Schema\SchemaTraverser;
-use PSX\Schema\TypeFactory;
-use PSX\Schema\Visitor\TypeVisitor;
+use PSX\Schema\SchemaSource;
 use Sdkgen\Client\Exception\ParseException;
 
 /**
@@ -34,12 +30,12 @@ use Sdkgen\Client\Exception\ParseException;
 class Parser
 {
     private string $baseUrl;
-    private SchemaManager $schemaManager;
+    private ObjectMapper $objectMapper;
 
     public function __construct(string $baseUrl)
     {
         $this->baseUrl = $this->normalizeBaseUrl($baseUrl);
-        $this->schemaManager = new SchemaManager();
+        $this->objectMapper = new ObjectMapper(new SchemaManager());
     }
 
     public function url(string $path, array $parameters): string
@@ -50,24 +46,11 @@ class Parser
     /**
      * @throws ParseException
      */
-    public function parse(string $data, string $class, bool $isMap = false, bool $isArray = false): mixed
+    public function parse(string $data, SchemaSource $source): mixed
     {
         try {
-            $data = JsonParser::decode($data);
-
-            $schema = $this->schemaManager->getSchema($class);
-            if ($isMap) {
-                $schema = new Schema(TypeFactory::getMap($schema->getType()), $schema->getDefinitions());
-            } elseif ($isArray) {
-                $schema = new Schema(TypeFactory::getArray($schema->getType()), $schema->getDefinitions());
-            }
-
-            return (new SchemaTraverser(false))->traverse($data, $schema, new TypeVisitor());
-        } catch (\JsonException $e) {
-            throw new ParseException('The server returned an in valid JSON format: ' . $e->getMessage(), 0, $e);
-        } catch (InvalidSchemaException $e) {
-            throw new ParseException('The provided schema is invalid: ' . $e->getMessage());
-        } catch (ValidationException $e) {
+            return $this->objectMapper->readJson($data, $source);
+        } catch (MappingException $e) {
             throw new ParseException('The provided JSON data does not match the schema: ' . $e->getMessage(), 0, $e);
         }
     }
