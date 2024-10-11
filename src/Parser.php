@@ -51,7 +51,7 @@ class Parser
         try {
             return $this->objectMapper->readJson($data, $source);
         } catch (MappingException $e) {
-            throw new ParseException('The provided JSON data does not match the schema: ' . $e->getMessage(), 0, $e);
+            throw new ParseException($e->getMessage(), previous: $e);
         }
     }
 
