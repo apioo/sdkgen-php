@@ -15,6 +15,7 @@ use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
 use PSX\Record\RecordableInterface;
+use PSX\Schema\Exception\InvalidSchemaException;
 use PSX\Schema\Exception\MappingException;
 use PSX\Schema\ObjectMapper;
 use PSX\Schema\SchemaManager;
@@ -46,11 +47,15 @@ class Parser
     /**
      * @throws ParseException
      */
-    public function parse(string $data, SchemaSource $source): mixed
+    public function parse(string $data, string|SchemaSource $source): mixed
     {
         try {
+            if (is_string($source)) {
+                $source = SchemaSource::fromClass($source);
+            }
+
             return $this->objectMapper->readJson($data, $source);
-        } catch (MappingException $e) {
+        } catch (MappingException|InvalidSchemaException $e) {
             throw new ParseException($e->getMessage(), previous: $e);
         }
     }
