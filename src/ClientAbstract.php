@@ -22,7 +22,7 @@ use Sdkgen\Client\Exception\Authenticator\InvalidCredentialsException;
  */
 abstract class ClientAbstract
 {
-    public const USER_AGENT = 'SDKgen Client v3.0';
+    public const USER_AGENT = 'SDKgen Client v2.0';
 
     protected AuthenticatorInterface $authenticator;
     protected Client $httpClient;
