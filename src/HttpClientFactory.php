@@ -24,11 +24,8 @@ use Psr\Http\Message\RequestInterface;
  */
 class HttpClientFactory
 {
-    private AuthenticatorInterface $authenticator;
-
-    public function __construct(AuthenticatorInterface $authenticator)
+    public function __construct(private AuthenticatorInterface $authenticator, private ?string $version = null)
     {
-        $this->authenticator = $authenticator;
     }
 
     public function factory(): Client
@@ -36,7 +33,11 @@ class HttpClientFactory
         $stack = HandlerStack::create();
         $stack->push(Middleware::mapRequest($this->authenticator));
         $stack->push(Middleware::mapRequest(function(RequestInterface $request) {
-            $request = $request->withHeader('User-Agent', ClientAbstract::USER_AGENT);
+            if ($this->version !== null && $this->version !== '') {
+                $request = $request->withHeader('User-Agent', ClientAbstract::USER_AGENT . '/' . $this->version);
+            } else {
+                $request = $request->withHeader('User-Agent', ClientAbstract::USER_AGENT);
+            }
             return $request->withHeader('Accept', 'application/json');
         }));
 

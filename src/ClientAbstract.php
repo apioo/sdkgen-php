@@ -22,7 +22,7 @@ use Sdkgen\Client\Exception\Authenticator\InvalidCredentialsException;
  */
 abstract class ClientAbstract
 {
-    public const USER_AGENT = 'SDKgen Client v2.0';
+    public const USER_AGENT = 'SDKgen';
 
     protected AuthenticatorInterface $authenticator;
     protected Client $httpClient;
@@ -31,10 +31,10 @@ abstract class ClientAbstract
     /**
      * @throws InvalidCredentialsException
      */
-    public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null)
+    public function __construct(string $baseUrl, ?CredentialsInterface $credentials = null, ?string $version = null)
     {
         $this->authenticator = AuthenticatorFactory::factory($credentials ?? new Credentials\Anonymous());
-        $this->httpClient = (new HttpClientFactory($this->authenticator))->factory();
+        $this->httpClient = (new HttpClientFactory($this->authenticator, $version))->factory();
         $this->parser = new Parser($baseUrl);
     }
 
