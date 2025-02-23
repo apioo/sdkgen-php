@@ -29,7 +29,7 @@ class Client extends ClientAbstract
 
     public static function build(string $token): self
     {
-        return new self('http://127.0.0.1:8081', new Credentials\HttpBearer($token));
+        return new self('http://127.0.0.1:8081', new Credentials\HttpBearer($token), '0.1.0');
     }
 
     public static function buildAnonymous(): self

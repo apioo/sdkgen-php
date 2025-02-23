@@ -51,7 +51,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('GET', $response->getMethod());
         $this->assertEquals(['startIndex' => 8, 'count' => 16, 'search' => 'foobar'], $response->getArgs()->getAll());
         $this->assertEquals(null, $response->getJson());
@@ -66,7 +66,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
@@ -81,7 +81,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('PUT', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
@@ -96,7 +96,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('PATCH', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals($payload, $response->getJson());
@@ -110,7 +110,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('DELETE', $response->getMethod());
         $this->assertEquals([], $response->getArgs()->getAll());
         $this->assertEquals(null, $response->getJson());
@@ -126,7 +126,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals('foobar', $response->getData());
     }
@@ -139,7 +139,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals(['foo' => 'bar'], $response->getForm()?->getAll());
     }
@@ -152,7 +152,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals('bar', $response->getJson()?->getString());
     }
@@ -168,7 +168,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals(['foo' => 'foobar'], $response->getFiles()?->getAll());
     }
@@ -181,7 +181,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals('foobar', $response->getData());
     }
@@ -194,7 +194,7 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals('Bearer my_token', $response->getHeaders()?->get('Authorization'));
         $this->assertEquals('application/json', $response->getHeaders()?->get('Accept'));
-        $this->assertEquals('SDKgen Client v2.0', $response->getHeaders()?->get('User-Agent'));
+        $this->assertEquals('SDKgen/0.1.0', $response->getHeaders()?->get('User-Agent'));
         $this->assertEquals('POST', $response->getMethod());
         $this->assertEquals('<foo>bar</foo>', $response->getData());
     }
